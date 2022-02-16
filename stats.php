@@ -1,21 +1,64 @@
 <?php
+/**
+ * @brief Class StatsFile and Stats for outputing statistics about source code
+ *
+ * This source code serves as submission for 
+ * the first part of the project of class IPP at FIT, BUT 2021/2022
+ * 
+ * @file    stats.php
+ * @author  Hung Do
+ * @date    16.02.2022
+ */
 
-require_once 'statsfile.php';
 require_once 'error.php';
 
 /**
+ * Class StatsFile
+ * @brief Statistic settings
+ */
+class StatsFile
+{
+    /** @var Output file destination */
+    readonly string $file_path;
+    /** @var List of chosen flags    */
+    readonly array $flags;
+
+    /**
+     * @brief Constructor of the class StatsFile
+     *
+     * @param $flags Chosen flags to be included in output file
+     * @param $path_file Output file destination
+     */
+    public function __construct(array $flags, string $path_file)
+    {
+        $this->path_file = $path_file;
+        $this->flags = $flags;
+    }
+
+    /**
+     * @brief Create output file
+     *
+     * @param #lof_stats List of all gathered stats
+     */
+    public function flushFile(array $lof_stats)
+    {
+        $file = fopen($file_path, "w");
+        foreach ($flags as $key)
+        {
+            fwrite($file, $lof_stats[$key]);
+            fwrite($file, "\n");
+        }
+        fclose($file);
+    }
+}
+
+
+/**
  * Class Stats
- * @brief XXX Staticka trida ukladajici statistiky
+ * @brief Static class with all available stats value of the source code
  */
 class Stats
 {
-    // public int $loc       = 0;
-    // public int $comments  = 0;
-    // public int $labels    = 0;
-    // public int $jumps     = 0;
-    // public int $fwjumps   = 0;
-    // public int $backjumps = 0;
-    // public int $badjumps  = 0;
     /** @var Table with all stats */
     public array $lof_stats = array( 
         "--loc"       => 0,
@@ -72,7 +115,4 @@ class Stats
             $item->flushFile($lof_stats);
     }
 }
-
-$g_stats = null;
-
 ?>
