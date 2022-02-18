@@ -19,9 +19,10 @@ require_once "stats.php";
 /**
  * @brief Lexical and syntax analysis of source file
  *
+ * @param stats Instance of class Stats (default: null)
  * @return List of loaded instructions
  */
-function parser()
+function parser($stats=null)
 {
     global $REG_STR, $INS_SET;
     $line = '';
@@ -33,7 +34,9 @@ function parser()
         $line = trim($line);
         if (preg_match("/$REG_STR[comment]/", $line))
         {
-            // TODO: stats
+            // increment number of comments and remove it
+            if (!is_null($stats))
+                $stats->inc_comments();
             $line = preg_replace("/$REG_STR[comment]/", "\n", $line);
         }
 
@@ -48,6 +51,11 @@ function parser()
             continue;
         }
 
+        // header must appear before any instruction
+        // only empty lines and comments are allowed appear before header
+        if (!$header)
+            exit(ErrorCode::MISSING_HEADER->value);
+
         // error validation variables
         $valid_cmd = false;
         $valid_syntax = false;
@@ -57,18 +65,21 @@ function parser()
             if (preg_match("/^(?i:$key)/", $line))
                 $valid_cmd = true;
 
-            // whole line validation (lexical and syntactic)
+            // whole line validation (lexical and syntax)
             if (preg_match($value, $line))
             {
+                $command = new Command($line);
+
                 // add instruction to list and continue to next instruction
-                array_push($lof_ins, new Command($line));
+                array_push($lof_ins, $command);
+                if (!is_null($stats))
+                    $stats->loc_analysis($command);
+
                 $valid_syntax = true;
                 break;
             }
         }
         // error checking
-        if (!$header)
-            exit(ErrorCode::MISSING_HEADER->value);
         if (!$valid_cmd)
             exit(ErrorCode::WRONG_COMMAND->value);
         if (!$valid_syntax)

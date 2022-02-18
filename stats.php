@@ -13,72 +13,53 @@
 require_once 'error.php';
 
 /**
- * Class StatsFile
- * @brief Statistic settings
- */
-class StatsFile
-{
-    /** @var Output file destination */
-    readonly string $file_path;
-    /** @var List of chosen flags    */
-    readonly array $flags;
-
-    /**
-     * @brief Constructor of the class StatsFile
-     *
-     * @param $flags Chosen flags to be included in output file
-     * @param $path_file Output file destination
-     */
-    public function __construct(array $flags, string $path_file)
-    {
-        $this->path_file = $path_file;
-        $this->flags = $flags;
-    }
-
-    /**
-     * @brief Create output file
-     *
-     * @param #lof_stats List of all gathered stats
-     */
-    public function flushFile(array $lof_stats)
-    {
-        $file = fopen($file_path, "w");
-        foreach ($flags as $key)
-        {
-            fwrite($file, $lof_stats[$key]);
-            fwrite($file, "\n");
-        }
-        fclose($file);
-    }
-}
-
-
-/**
  * Class Stats
  * @brief Static class with all available stats value of the source code
  */
 class Stats
 {
-    /** @var Table with all stats */
-    public array $lof_stats = array( 
-        "--loc"       => 0,
-        "--comments"  => 0,
-        "--labels"    => 0,
-        "--jumps"     => 0,
-        "--fwjumps"   => 0,
-        "--backjumps" => 0,
-        "--badjumps"  => 0
-    );
-    /** @var List of StatsFile instances */
-    private array $lof_files;
-    private array $used_file_names;
+    private $loc        = 0;    ///< line of code counter
+    private $comments   = 0;    ///< comment counter
+    private $labels     = 0;    ///< (unique) label counter
+    private $jumps      = 0;    ///< jump counter
+    private $fwjumps    = 0;    ///< jump forward counter
+    private $backjumps  = 0;    ///< jump back counter
+    private $badjumps   = 0;    ///< jump to undefined label counter
+
+    private $lof_files = [];        ///< list of asked stats file
+    private $used_file_names = [];  ///< list of used stats file path
+
+    // Label arrays
+    private $defined_lbl = [];      ///< list of defined labels
+    private $undefined_lbl = [];    ///< list of undefined labels with call counter
 
     /**
      * @breif Constructor of the class Stats
      */
-    public function __construct()
+    public function __construct() { }
+
+    public function __get($name)
     {
-        // TODO:
+        switch($name)
+        {
+            case 'loc':         return $this->loc;
+            case 'comments':    return $this->comments;
+            case 'labels':      return $this->labels;
+            case 'jumps':       return $this->jumps;
+            case 'fwjumps':     return $this->fwjumps;
+            case 'backjumps':    return $this->backjumps;
+            case 'badjumps':    return $this->badjumps;
+            default:
+                throw new OutOfBoundsException('Member is not gettable');
+        }
+    }
+
+    /**
+     * @brief Increases comment counter
+     */
+    public function inc_comments()
+    {
+        $this->comments++;
     }
 
     /**
@@ -91,15 +72,68 @@ class Stats
      * @param file_name Output fil destination
      * @return 0 or error code
      */
-    public function appendStatsInstance(array $flags, string $file_path)
+    public function append_stats_instance(array $flags, string $file_path)
     {
         // checks whether file_path is already in use
-        if (in_array($file_path, $used_file_names))
-            return 99; // TODO: error code
+        if (in_array($file_path, $this->used_file_names))
+            return ErrorCode::OUT_FILE_ERROR->value; // TODO: error code
 
-        array_push($lof_files, new StatsFile($flags, $file_path));
-        array_push($used_file_names, $file_path);
-        return Error::NO_ERROR;
+        // array_push($lof_files, new StatsFile($flags, $file_path));
+        $this->lof_files[$file_path] = $flags;
+        array_push($this->used_file_names, $file_path);
+        return ErrorCode::NO_ERROR->value;
+    }
+
+    /**
+     * @brief Evaluates line of code to increment counter values
+     *
+     * Used for statistics
+     *
+     * @param cmd Object of class Command; one instruction of the program
+     */
+    public function loc_analysis($command)
+    {
+        if (!strcasecmp($command->ins, 'label'))
+        {
+            $label = $command->args[0]->value;
+            if (in_array($label, array_keys($this->undefined_lbl)))
+            {
+                // update fwjumps and badjumps by the number of label calls
+                $this->fwjumps += $this->undefined_lbl[$label];
+                $this->badjumps -= $this->undefined_lbl[$label];
+
+                // move new label from undefined to defined array
+                array_push($this->defined_lbl, $label);
+                unset($this->undefined_lbl[$label]);
+                $this->labels++;
+            }
+
+            // new label
+            elseif (!in_array($label, $this->defined_lbl))
+            {
+                array_push($this->defined_lbl, $label);
+                $this->labels++; // XXX: no duplicates
+            }
+            // $this->labels++; // XXX: duplication allowed
+        }
+        // jumps
+        elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call)/i", $command->ins))
+        {
+            $label = $command->args[0]->value;
+            // already defined label
+            if (in_array($label, $this->defined_lbl))
+                $this->backjumps++;
+
+            // for undefined label
+            $this->badjumps++;
+            if (in_array($label, $this->undefined_lbl))
+                $this->undefined_lbl[$label]++;
+            else
+                $this->undefined_lbl[$label] = 1;
+
+            $this->jumps++;
+        }
+        $this->loc++;
     }
 
     /**
@@ -107,12 +141,23 @@ class Stats
      *
      * @return 0 or error code
      */
-    public function flushFiles()
+    public function flush_files()
     {
-        // Go through all instances of StatsFile
-        // and creates a file for each of them
-        foreach ($lof_sf as $item)
-            $item->flushFile($lof_stats);
+        // Go through $this->files
+        // and creates a file for each of stats
+        foreach ($this->lof_files as $path => $flags)
+        {
+            if ( !($file = fopen($path, "w")) )
+                return ErrorCode::UNDEFINED_ERROR->value;
+
+            foreach ($flags as $flag)
+            {
+                fwrite($file, $this->$flag);
+                fwrite($file, "\n");
+            }
+            fclose($file);
+        }
+        return ErrorCode::NO_ERROR->value;
     }
 }
 ?>

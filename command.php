@@ -1,6 +1,6 @@
 <?php
 /**
- * @brief Class Command representing one instruction in program
+ * @brief Classes Command and CommandArgument representing instructions in program
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
@@ -11,12 +11,37 @@
  */
 
 /**
+ * Class CommandArgument
+ * @brif Class of one argument in instruction
+ */
+class CommandArgument
+{
+    private $type;
+    private $value;
+
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+    public function __get($name)
+    {
+        switch($name)
+        {
+        case 'type': return $this->type;
+        case 'value': return $this->value;
+        }
+    }
+}
+
+/**
  * Class Command
- * @brief Abstract class of one instruction in program
+ * @brief Class of one instruction in program
  */
 class Command
 {
-    public string $cmd;     ///< Instruction name
+    public string $ins;     ///< Instruction name
     public array $args;     ///< List of arguments
 
     public function __construct($input)
@@ -24,33 +49,32 @@ class Command
         // remove newline character
         $input = trim($input);
 
-        $cmd_data = preg_split("/\s+/", $input);
-        if (count($cmd_data) > 0)
-            $this->cmd  = strtoupper($cmd_data[0]);
+        $ins_data = preg_split("/\s+/", $input);
+        if (count($ins_data) > 0)
+            $this->ins  = strtoupper($ins_data[0]);
 
         // load arguments
         $this->args = [];
-        if (count($cmd_data) > 1)
-            array_push($this->args, $cmd_data[1]);
-        if (count($cmd_data) > 2)
-            array_push($this->args, $cmd_data[2]);
-        if (count($cmd_data) > 3)
-            array_push($this->args, $cmd_data[3]);
+        if (count($ins_data) > 1)
+            $this->extract_data($ins_data[1]);
+        if (count($ins_data) > 2)
+            $this->extract_data($ins_data[2]);
+        if (count($ins_data) > 3)
+            $this->extract_data($ins_data[3]);
     }
 
     /**
-     * @brief Generate arguments in xmlwriter
+     * @brief Convert string to CommandArgument
+     * 
+     * Newly created instance of CommandArgument
+     * is push to array $this->args. 
+     * It's a part of preparation for generating XML file
      *
-     * @param xw    Opened xmlwriter
-     * @param data  Current argument
-     * @param index Argument position
+     * @param data Argument string; must be trimmed beforehand
      */
-    private function generate_arg_xml($xw, $data, $index)
+    private function extract_data($data)
     {
         global $REG_STR;
-        // <argX>
-        xmlwriter_start_element($xw, "arg$index");
-
         // get type and value
         if (preg_match("/^$REG_STR[var]$/", $data))
         {
@@ -67,28 +91,18 @@ class Command
             $type = 'label';
             $value = $data;
         }
+        else if (preg_match("/^$REG_STR[str]$/", $data))
+        {
+            $type = 'string';
+            $value = preg_replace("/^string@/", "", $data);
+        }
         else
         {
             $tmp = explode("@", $data);
             $type = $tmp[0];
             $value = $tmp[1];
         }
-
-        // replace problematic characters
-        str_replace("&", "&amp", $data);
-        str_replace("<", "&lt", $data);
-        str_replace(">", "&gt", $data);
-
-        // <argX type="XXX">
-        xmlwriter_start_attribute($xw, 'type');
-        xmlwriter_text($xw, "$type");
-        xmlwriter_end_attribute($xw);
-
-        // content
-        xmlwriter_text($xw, "$value");
-
-        // </argX>
-        xmlwriter_end_element($xw);
+        array_push($this->args, new CommandArgument($type, $value));
     }
 
     /**
@@ -108,12 +122,34 @@ class Command
         xmlwriter_end_attribute($xw);
 
         xmlwriter_start_attribute($xw, 'opcode');
-        xmlwriter_text($xw, "$this->cmd");
+        xmlwriter_text($xw, "$this->ins");
         xmlwriter_end_attribute($xw);
 
         // <argX type="XXX">XXX</argX>
         foreach ($this->args as $index => $item)
-            $this->generate_arg_xml($xw, $item, $index+1);
+        {
+            $index += 1;
+            $value = $item->value;
+
+            // <argX>
+            xmlwriter_start_element($xw, "arg$index");
+
+            // replace problematic characters
+            str_replace("&", "&amp", $value);
+            str_replace("<", "&lt", $value);
+            str_replace(">", "&gt", $value);
+
+            // <argX type="XXX">
+            xmlwriter_start_attribute($xw, 'type');
+            xmlwriter_text($xw, "$item->type");
+            xmlwriter_end_attribute($xw);
+
+            // content
+            xmlwriter_text($xw, "$value");
+
+            // </argX>
+            xmlwriter_end_element($xw);
+        }
 
         // </instruction>
         xmlwriter_end_element($xw);
@@ -121,7 +157,7 @@ class Command
 
     public function __toString()
     {
-        return $cmd . $args;
+        return $ins . $args;
     }
 }
 ?>
