@@ -157,7 +157,7 @@ class Command
 
     public function __toString()
     {
-        return $ins . $args;
+        return $this->ins . $this->args;
     }
 }
 ?>

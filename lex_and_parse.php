@@ -27,10 +27,12 @@ function parser($stats=null)
     global $REG_STR, $INS_SET;
     $line = '';
     $lof_ins = [];
+    $line_count = 0;
 
     $header = false;
     while ( ($line = fgets(STDIN)) )
     {
+        $line_count++;
         $line = trim($line);
         if (preg_match("/$REG_STR[comment]/", $line))
         {
@@ -54,7 +56,10 @@ function parser($stats=null)
         // header must appear before any instruction
         // only empty lines and comments are allowed appear before header
         if (!$header)
+        {
+            error_log("Chybi hlavicka .IPPcode22 ve zdrojovem kodu!");
             exit(ErrorCode::MISSING_HEADER->value);
+        }
 
         // error validation variables
         $valid_cmd = false;
@@ -62,7 +67,7 @@ function parser($stats=null)
         foreach($INS_SET as $key => $value)
         {
             // instruction validation
-            if (preg_match("/^(?i:$key)/", $line))
+            if (preg_match("/^(?i:$key)(\s|$)/", $line))
                 $valid_cmd = true;
 
             // whole line validation (lexical and syntax)
@@ -81,9 +86,15 @@ function parser($stats=null)
         }
         // error checking
         if (!$valid_cmd)
+        {
+            error_log("Neznama instrukce!\n\n----- Radek $line_count -----\n$line");
             exit(ErrorCode::WRONG_COMMAND->value);
+        }
         if (!$valid_syntax)
+        {
+            error_log("Chybna syntaxe!\n\n----- Radek $line_count -----\n$line");
             exit(ErrorCode::UNDEF_LEX_OR_SYNTAX_ERROR->value);
+        }
     }
     return $lof_ins;
 }

@@ -11,6 +11,10 @@
  */
 
 require_once 'lex_and_parse.php';
+require_once 'arguments.php';
+
+// output error messages to stderr
+ini_set('display_errors', 'stderr');
 
 /**
  * @brief Generates list of instructions to XML
@@ -42,8 +46,10 @@ function ins_to_xml($lof_ins)
 
 
 // main function
-// TODO: arguments handling
-$lof_ins = parser();
+$stats = Arguments::process_args($argc, $argv);
+$lof_ins = parser($stats);
 ins_to_xml($lof_ins);
+if (!is_null($stats))
+    $stats->flush_files();
 
 ?>

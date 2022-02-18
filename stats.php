@@ -66,22 +66,23 @@ class Stats
      * @brief Push new instance of StatsFile to $lof_files
      *
      * Check if file_path (output file destination) is unique.
-     * If not the function returns given error code.
+     * If not exit with given error code.
      *
      * @param $flags List of chosen flags
      * @param file_name Output fil destination
-     * @return 0 or error code
      */
     public function append_stats_instance(array $flags, string $file_path)
     {
         // checks whether file_path is already in use
         if (in_array($file_path, $this->used_file_names))
-            return ErrorCode::OUT_FILE_ERROR->value; // TODO: error code
+        {
+            error_log("Zadany soubor $file_path je jiz pouzivat pro vypis statistik");
+            exit(ErrorCode::OUT_FILE_ERROR->value);
+        }
 
         // array_push($lof_files, new StatsFile($flags, $file_path));
         $this->lof_files[$file_path] = $flags;
         array_push($this->used_file_names, $file_path);
-        return ErrorCode::NO_ERROR->value;
     }
 
     /**
@@ -117,7 +118,10 @@ class Stats
             // $this->labels++; // XXX: duplication allowed
         }
         // jumps
-        elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call)/i", $command->ins))
+        elseif (preg_match("/^return/i", $command->line))
+            $this->jumps++;
+            // TODO: fwjump, backjump ??
+        elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call|return)/i", $command->ins))
         {
             $label = $command->args[0]->value;
             // already defined label
@@ -138,8 +142,6 @@ class Stats
 
     /**
      * @brief Creates all statistics file
-     *
-     * @return 0 or error code
      */
     public function flush_files()
     {
@@ -148,7 +150,10 @@ class Stats
         foreach ($this->lof_files as $path => $flags)
         {
             if ( !($file = fopen($path, "w")) )
-                return ErrorCode::UNDEFINED_ERROR->value;
+            {
+                error_log("Chyba pri otevirani souboru $path");
+                exit(ErrorCode::UNDEFINED_ERROR->value);
+            }
 
             foreach ($flags as $flag)
             {
@@ -157,7 +162,6 @@ class Stats
             }
             fclose($file);
         }
-        return ErrorCode::NO_ERROR->value;
     }
 }
 ?>
