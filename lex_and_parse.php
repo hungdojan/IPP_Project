@@ -1,14 +1,12 @@
 <?php
 /**
- * @brief File contains main function _parser_ that does
+ * File contains main function _parser_ that does
  *  lexical and syntax analysis of the source file
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
  * 
- * @file    lex_and_parse.php
  * @author  Hung Do
- * @date    16.02.2022
  */
 
 require_once "error.php";
@@ -17,10 +15,10 @@ require_once "command.php";
 require_once "stats.php";
 
 /**
- * @brief Lexical and syntax analysis of source file
+ * Lexical and syntax analysis of source file
  *
  * @param stats Instance of class Stats (default: null)
- * @return List of loaded instructions
+ * @return array List of loaded instructions
  */
 function parser($stats=null)
 {
@@ -98,4 +96,5 @@ function parser($stats=null)
     }
     return $lof_ins;
 }
+/* lex_and_parse.php */
 ?>

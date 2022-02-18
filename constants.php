@@ -1,13 +1,11 @@
 <?php
 /**
- * @brief File with constants
+ * File with constants
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
  * 
- * @file    constants.php
  * @author  Hung Do
- * @date    16.02.2022
  */
 
 /** List of elementary regular expressions */
@@ -25,7 +23,7 @@ $REG_STR = array(
 $REG_STR['symb'] = "($REG_STR[var]|$REG_STR[str]|$REG_STR[int]|$REG_STR[bool]|$REG_STR[nil])";
 
 /**
- * @brief Create instruction regex by concatenating elementary regex
+ * Create instruction regex by concatenating elementary regex
  *
  * @param cmd   Instruction name
  * @param arg1  First argument (default value: null)
@@ -92,5 +90,5 @@ $INS_SET = array(
     'DPRINT'      => init_regex("dprint", $REG_STR['symb']),
     'BREAK'       => init_regex("break")
 );
-
+/* constants */
 ?>

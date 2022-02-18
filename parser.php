@@ -1,13 +1,11 @@
 <?php
 /**
- * @brief Main file
+ * Main file
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
  * 
- * @file    parser.php
  * @author  Hung Do
- * @date    16.02.2022
  */
 
 require_once 'lex_and_parse.php';
@@ -17,7 +15,7 @@ require_once 'arguments.php';
 ini_set('display_errors', 'stderr');
 
 /**
- * @brief Generates list of instructions to XML
+ * Generates list of instructions to XML
  *
  * @param lof_ins   List of instruction
  */
@@ -52,4 +50,5 @@ ins_to_xml($lof_ins);
 if (!is_null($stats))
     $stats->flush_files();
 
+/* parser.php */
 ?>

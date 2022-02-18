@@ -1,20 +1,18 @@
 <?php
 /**
- * @brief Class StatsFile and Stats for outputing statistics about source code
+ * Class StatsFile and Stats for outputing statistics about source code
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
  * 
- * @file    stats.php
  * @author  Hung Do
- * @date    16.02.2022
  */
 
 require_once 'error.php';
 
 /**
  * Class Stats
- * @brief Static class with all available stats value of the source code
+ * Static class with all available stats value of the source code
  */
 class Stats
 {
@@ -55,7 +53,7 @@ class Stats
     }
 
     /**
-     * @brief Increases comment counter
+     * Increases comment counter
      */
     public function inc_comments()
     {
@@ -63,7 +61,7 @@ class Stats
     }
 
     /**
-     * @brief Push new instance of StatsFile to $lof_files
+     * Push new instance of StatsFile to $lof_files
      *
      * Check if file_path (output file destination) is unique.
      * If not exit with given error code.
@@ -86,11 +84,11 @@ class Stats
     }
 
     /**
-     * @brief Evaluates line of code to increment counter values
+     * Evaluates line of code to increment counter values
      *
      * Used for statistics
      *
-     * @param cmd Object of class Command; one instruction of the program
+     * @param command Object of class Command; one instruction of the program
      */
     public function loc_analysis($command)
     {
@@ -141,7 +139,7 @@ class Stats
     }
 
     /**
-     * @brief Creates all statistics file
+     * Creates all statistic files
      */
     public function flush_files()
     {
@@ -164,4 +162,5 @@ class Stats
         }
     }
 }
+/* stats.php */
 ?>

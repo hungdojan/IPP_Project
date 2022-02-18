@@ -1,6 +1,6 @@
 <?php
 /**
- * @brief Classes Command and CommandArgument representing instructions in program
+ * Classes Command and CommandArgument representing instructions in program
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
@@ -12,7 +12,7 @@
 
 /**
  * Class CommandArgument
- * @brif Class of one argument in instruction
+ * Class of one argument in instruction
  */
 class CommandArgument
 {
@@ -37,7 +37,7 @@ class CommandArgument
 
 /**
  * Class Command
- * @brief Class of one instruction in program
+ * Class of one instruction in program
  */
 class Command
 {
@@ -64,7 +64,7 @@ class Command
     }
 
     /**
-     * @brief Convert string to CommandArgument
+     * Convert string to CommandArgument
      * 
      * Newly created instance of CommandArgument
      * is push to array $this->args. 
@@ -106,7 +106,7 @@ class Command
     }
 
     /**
-     * @brief Generate instruction in xmlwriter
+     * Generate instruction in xmlwriter
      *
      * @param xw    Opened xmlwriter
      * @param order Number of order

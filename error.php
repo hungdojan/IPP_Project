@@ -1,18 +1,16 @@
 <?php
 /**
- * @brief Enumeration of error codes
+ * Enumeration of error codes
  *
  * This source code serves as submission for 
  * the first part of the project of class IPP at FIT, BUT 2021/2022
  * 
- * @file    error.php
  * @author  Hung Do
- * @date    16.02.2022
  */
 
 /** 
  * enum ErrorCode
- * @brief Enumeration of error codes
+ * Enumeration of error codes
  */
 enum ErrorCode: int
 {
@@ -28,4 +26,5 @@ enum ErrorCode: int
 
     case UNDEFINED_ERROR = 99;  ///< other type of errors
 }
+/* error.php */
 ?>
