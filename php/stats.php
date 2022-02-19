@@ -111,14 +111,12 @@ class Stats
             elseif (!in_array($label, $this->defined_lbl))
             {
                 array_push($this->defined_lbl, $label);
-                $this->labels++; // XXX: no duplicates
+                $this->labels++;
             }
-            // $this->labels++; // XXX: duplication allowed
         }
         // jumps
         elseif (preg_match("/^return/i", $command->line))
             $this->jumps++;
-            // TODO: fwjump, backjump ??
         elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call|return)/i", $command->ins))
         {
             $label = $command->args[0]->value;
