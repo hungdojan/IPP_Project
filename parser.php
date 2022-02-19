@@ -8,8 +8,8 @@
  * @author  Hung Do
  */
 
-require_once 'lex_and_parse.php';
-require_once 'arguments.php';
+require_once 'php/lex_and_parse.php';
+require_once 'php/arguments.php';
 
 // output error messages to stderr
 ini_set('display_errors', 'stderr');
