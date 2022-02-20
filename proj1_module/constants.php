@@ -15,7 +15,7 @@ $REG_STR = array(
     'int'     => "int@[-]?\d+",
     'bool'    => "bool@(true|false)",
     'nil'     => "nil@nil",
-    'label'   => "\b[a-zA-Z]+\b",
+    'label'   => "[a-zA-Z0-9_$&%*!?-]+(?=\W|$)",
     'type'    => "(int|bool|string)",
     'header'  => "\.IPPcode22",
     'comment' => "#.*"
