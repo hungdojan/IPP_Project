@@ -50,24 +50,23 @@ class CoreData:
             return cls.temp_frame.get_var(simplified_name)
 
     @classmethod
-    def get_symbol_value(cls, argument):
+    def get_symbol(cls, argument):
         if argument.type == 'var':
-            return cls.get_variable(argument.value).value
-        elif argument.type == 'nil':
-            return None
-        return argument.value
+            var: Variable = cls.get_variable(argument.value)
+            return var
+        else:
+            return argument
+
 
 def move(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
+    op1 = CoreData.get_symbol(args[1])
 
     # initialization check
-    if op1_type == 'UNDEF':
+    if op1.type == 'UNDEF':
         sys.exit(ErrorCode.RUNTIME_MISSING_VALUE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    var.value = op1_val
+    var.value = op1.value
     return ins_order + 1
 
 
@@ -152,54 +151,42 @@ def pops(ins_order: int, args: list):
 
 def add(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # TODO: float??
     # runtime type check
-    if op1_type != 'int' or op2_type != 'int':
+    if op1.type != 'int' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val + op2_val
+    var.value = op1.value + op2.value
 
     return ins_order + 1
 
 def sub(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # TODO: float??
     # runtime type check
-    if op1_type != 'int' or op2_type != 'int':
+    if op1.type != 'int' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val - op2_val
+    var.value = op1.value - op2.value
     return ins_order + 1
 
 def mul(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # TODO: float??
     # runtime type check
-    if op1_type != 'int' or op2_type != 'int':
+    if op1.type != 'int' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val * op2_val
+    var.value = op1.value * op2.value
     return ins_order + 1
 
 def div(ins_order: int, args: list):
@@ -207,159 +194,127 @@ def div(ins_order: int, args: list):
 
 def idiv(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # TODO: float??
     # runtime type check
-    if op1_type != 'int' or op2_type != 'int':
+    if op1.type != 'int' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val / op2_val
+    var.value = op1.value / op2.value
     return ins_order + 1
 
 def lt(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # TODO: float??
     # runtime type check
-    if op1_type == 'nil' or op2_type == 'nil':
+    if op1.type == 'nil' or op2.type == 'nil':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
-    if op1_type != op2_type:
+    if op1.type != op2.type:
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val > op2_val
+    var.value = op1.value > op2.value
     return ins_order + 1
 
 def gt(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # TODO: float??
     # runtime type check
-    if op1_type == 'nil' or op2_type == 'nil':
+    if op1.type == 'nil' or op2.type == 'nil':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
-    if op1_type != op2_type:
+    if op1.type != op2.type:
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val < op2_val
+    var.value = op1.value < op2.value
     return ins_order + 1
 
 def eq(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # TODO: float??
     # runtime type check
-    if op1_type != op2_type and (op1_type != 'nil' or op2_type != 'nil'):
+    if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val == op2_val
+    var.value = op1.value == op2.value
     return ins_order + 1
 
 def and_i(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # runtime type check
-    if op1_type != 'bool' or op2_type != 'bool':
+    if op1.type != 'bool' or op2.type != 'bool':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val and op2_val
+    var.value = op1.value and op2.value
     return ins_order + 1
 
 def or_i(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # runtime type check
-    if op1_type != 'bool' or op2_type != 'bool':
+    if op1.type != 'bool' or op2.type != 'bool':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val or op2_val
+    var.value = op1.value or op2.value
     return ins_order + 1
 
 def not_i(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
+    op1 = CoreData.get_symbol(args[1])
 
     # runtime type check
-    if op1_type != 'bool':
+    if op1.type != 'bool':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    var.value = not op1_val
+    var.value = not op1.value
     return ins_order + 1
 
 def int2char(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
+    op1 = CoreData.get_symbol(args[1])
 
     # runtime type check
-    if op1_type != 'int':
+    if op1.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
 
     # ord function range check
-    if op1_val not in range(UNICODE_MAX_VAL + 1):
+    if op1.value not in range(UNICODE_MAX_VAL + 1):
         sys.exit(ErrorCode.RUNTIME_STRING_HANDLING)
 
-    var.value = chr(op1_val)
+    var.value = chr(op1.value)
     return ins_order + 1
 
 def stri2int(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # runtime type check
-    if op1_type != 'string' or op2_type != 'int':
+    if op1.type != 'string' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
 
     # index range check
-    if op2_val not in range(len(op1_val)):
+    if op2.value not in range(len(op1.value)):
         sys.exit(ErrorCode.RUNTIME_STRING_HANDLING)
 
     var.value = ord()
@@ -369,13 +324,13 @@ def read(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
 
     # data type
-    op1_val = args[1].value
+    op1.value = args[1].value
 
-    if op1_val == 'string':
+    if op1.value == 'string':
         var.value = input()
-    elif op1_val == 'bool':
+    elif op1.value == 'bool':
         var.value == (input() == 'true')
-    elif op1_val == 'int':
+    elif op1.value == 'int':
         try:
             var.value = int(input())
         except:
@@ -386,112 +341,90 @@ def read(ins_order: int, args: list):
     return ins_order + 1
 
 def write(ins_order: int, args: list):
-    symb_type = (args[0].type if args[0].type != 'var' 
-                else CoreData.get_variable(args[0].value).type)
+    symb = CoreData.get_symbol(args[0])
 
-    # initialization check
-    if symb_type == 'UNDEF':
-        sys.exit(ErrorCode.RUNTIME_MISSING_VALUE)
-
-    symb_val = CoreData.get_symbol_value(args[0])
-
-    if symb_type == 'nil':
-        print('', end='')
-    elif symb_type == 'bool':
-        output_msg = 'true' if symb_val else 'false'
-        print(output_msg, end='')
+    if symb.type == 'nil':
+        print('', end='', flush=True)
+    elif symb.type == 'bool':
+        output_msg = 'true' if symb.value else 'false'
+        print(output_msg, end='', flush=True)
     else:
-        print(symb_val, end='')
+        print(symb.value, end='', flush=True)
     return ins_order + 1
 
 def concat(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # runtime type check
-    if op1_type != 'string' or op2_type != 'string':
+    if op1.type != 'string' or op2.type != 'string':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    var.value = op1_val + op2_val
+    var.value = op1.value + op2.value
     return ins_order + 1
 
 def strlen(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
+    op1 = CoreData.get_symbol(args[1])
 
     # runtime type check
-    if op1_type != 'string':
+    if op1.type != 'string':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    var.value = len(op1_val)
+    var.value = len(op1.value)
     return ins_order + 1
 
 def getchar(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
 
     # runtime type check
-    if op1_type != 'string' or op2_type != 'int':
+    if op1.type != 'string' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
 
     # index range check
-    if op2_val not in range(len(op1_val)):
+    if op2.value not in range(len(op1.value)):
         sys.exit(ErrorCode.RUNTIME_STRING_HANDLING)
 
-    var.value = op1_val[op2_val]
+    var.value = op1.value[op2.value]
     return ins_order + 1
 
 def setchar(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var'
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # runtime type check
-    if var.type != 'string' or op1_type != 'int' or op2_type != 'string':
+    if var.type != 'string' or op1.type != 'int' or op2.type != 'string':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
 
     # index range check
-    if op1_val not in range(len(var.value)) or len(op2_val) == 0:
+    if op1.value not in range(len(var.value)) or len(op2.value) == 0:
         sys.exit(ErrorCode.RUNTIME_STRING_HANDLING)
 
     # ----- setchar ------
-    new_char = op2_val[0]
+    new_char = op2.value[0]
     new_str  = list(var.value)
-    new_str[op1_val] = new_char
+    new_str[op1.value] = new_char
     var.value = ''.join(new_str)
     # --------------------
     return ins_order + 1
 
 def type_i(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
-    op1_type = (args[1].type if args[1].type != 'var'
-                else CoreData.get_variable(args[1].value).type)
+    op1 = CoreData.get_symbol(args[1])
 
     # runtime type check
-    if op1_type == 'UNDEF':
-        op1_type = ''
+    if op1.type == 'UNDEF':
+        op1.value = ''
 
-    var.value = op1_type
+    var.value = op1.type
     return ins_order + 1
 
 def label(ins_order: int, _):
@@ -509,10 +442,8 @@ def jump(ins_order: int, args: list):
 
 def jumpifeq(ins_order: int, args: list):
     lbl_name = args[0].value
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # label check
     index_if_true = CoreData.labels.get(lbl_name)
@@ -522,19 +453,15 @@ def jumpifeq(ins_order: int, args: list):
 
     # TODO: float??
     # runtime type check
-    if op1_type != op2_type and (op1_type != 'nil' or op2_type != 'nil'):
+    if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    return index_if_true if op1_val == op2_val else ins_order + 1
+    return index_if_true if op1.value == op2.value else ins_order + 1
 
 def jumpifneq(ins_order: int, args: list):
     lbl_name = args[0].value
-    op1_type = (args[1].type if args[1].type != 'var' 
-                else CoreData.get_variable(args[1].value).type)
-    op2_type = (args[2].type if args[2].type != 'var' 
-                else CoreData.get_variable(args[2].value).type)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
 
     # label check
     index_if_true = CoreData.labels.get(lbl_name)
@@ -544,49 +471,41 @@ def jumpifneq(ins_order: int, args: list):
 
     # TODO: float??
     # runtime type check
-    if op1_type != op2_type and (op1_type != 'nil' or op2_type != 'nil'):
+    if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    op1_val = CoreData.get_symbol_value(args[1])
-    op2_val = CoreData.get_symbol_value(args[2])
-    return index_if_true if op1_val != op2_val else ins_order + 1
+    return index_if_true if op1.value != op2.value else ins_order + 1
 
 def exit_i(ins_order: int, args: list):
-    symb_type = (args[0].type if args[0].type != 'var' 
-                else CoreData.get_variable(args[0].value).type)
+    symb  = CoreData.get_symbol(args[0])
 
     # initialization check
-    if symb_type != 'int':
+    if symb.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    symb_val = CoreData.get_symbol_value(args[0])
-
-    if symb_val not in range(50):
+    if symb.value not in range(50):
         sys.exit(ErrorCode.RUNTIME_WRONG_VALUE)
     # dead code
     return ins_order + 1
 
 def dprint(ins_order: int, args: list):
-    symb_type = (args[0].type if args[0].type != 'var' 
-                else CoreData.get_variable(args[0].value).type)
+    symb = CoreData.get_symbol(args[0])
 
     # initialization check
-    if symb_type == 'UNDEF':
+    if symb.type == 'UNDEF':
         sys.exit(ErrorCode.RUNTIME_MISSING_VALUE)
 
-    symb_val = CoreData.get_symbol_value(args[0])
-
-    if symb_type == 'nil':
+    if symb.type == 'nil':
         sys.stderr.write('')
-    elif symb_type == 'bool':
-        output_msg = 'true' if symb_val else 'false'
+    elif symb.type == 'bool':
+        output_msg = 'true' if symb.value else 'false'
         sys.stderr.write(output_msg)
     else:
-        sys.stderr.write(symb_val)
+        sys.stderr.write(symb.value)
     return ins_order + 1
 
 def break_i(ins_order: int, args: list):
-    # TODO: -> get command
+    sys.stderr.write("================================\n")
     sys.stderr.write(f"Pozice v kodu: {ins_order + 1}. \n")
 
     # item[0] -> var name
@@ -604,6 +523,7 @@ def break_i(ins_order: int, args: list):
         sys.stderr.write(f"\t{item[0]}: {item[1]}\n")
 
     sys.stderr.write(f"Pocet vykonanych instrukci: {CoreData.ins_performed}\n")
+    sys.stderr.write("================================\n")
 
     return ins_order + 1
 

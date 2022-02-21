@@ -32,17 +32,13 @@ class Variable:
         else:
             sys.exit(ErrorCode.UNDEFINED_ERROR)
 
-    def _format_str(self):
-        # TODO: format string \032 -> ' '
-        pass
-
     @staticmethod
     def simplify_var_name(var_name: str):
         """ Removes prefixes GF@, LF@, TF@ """
         return re.sub("^(GF|LF|TF)@", "", var_name)
 
     def __str__(self):
-        return ""
+        return f"[{self._type}: {self._value}]"
 
     def __repr__(self):
         return str(self)
@@ -51,16 +47,17 @@ class Frame:
 
     def __init__(self):
         self.is_active = True
-        self._var_names = []
         self.vars = {}
 
     def add_variable(self, var_name: str):
-        if var_name in self._var_names:
+        # check if variable exists
+        if self.vars.get(var_name) is not None:
             sys.exit(ErrorCode.SEMANTIC_ERROR)
-        self._var_names.append(var_name)
         self.vars[var_name] = Variable()
 
     def get_var(self, var_name: str):
-        if var_name not in self._var_names:
+        var = self.vars.get(var_name)
+        # check if variable exists
+        if var is None:
             sys.exit(ErrorCode.RUNTIME_UNDEF_VAR)
-        return self.vars[var_name]
+        return var
