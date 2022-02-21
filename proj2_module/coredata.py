@@ -154,9 +154,9 @@ def add(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-    # TODO: float??
     # runtime type check
-    if op1.type != 'int' or op2.type != 'int':
+    if (op1.type not in ('int', 'float') or op2.type != ('int', 'float')
+        or op1.type != op2.type):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value + op2.value
@@ -168,9 +168,9 @@ def sub(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-    # TODO: float??
     # runtime type check
-    if op1.type != 'int' or op2.type != 'int':
+    if (op1.type not in ('int', 'float') or op2.type != ('int', 'float')
+        or op1.type != op2.type):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value - op2.value
@@ -181,15 +181,25 @@ def mul(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-    # TODO: float??
     # runtime type check
-    if op1.type != 'int' or op2.type != 'int':
+    if (op1.type not in ('int', 'float') or op2.type != ('int', 'float')
+        or op1.type != op2.type):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value * op2.value
     return ins_order + 1
 
 def div(ins_order: int, args: list):
+    var: Variable = CoreData.get_variable(args[0].value)
+    op1 = CoreData.get_symbol(args[1])
+    op2 = CoreData.get_symbol(args[2])
+
+    # runtime type check
+    if (op1.type not in ('int', 'float') or op2.type != ('int', 'float')
+        or op1.type != op2.type):
+        sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
+
+    var.value = op1.value / op2.value
     return ins_order + 1
 
 def idiv(ins_order: int, args: list):
@@ -197,12 +207,12 @@ def idiv(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-    # TODO: float??
     # runtime type check
-    if op1.type != 'int' or op2.type != 'int':
+    if (op1.type not in ('int', 'float') or op2.type != ('int', 'float')
+        or op1.type != op2.type):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-    var.value = op1.value / op2.value
+    var.value = op1.value // op2.value
     return ins_order + 1
 
 def lt(ins_order: int, args: list):
@@ -210,8 +220,6 @@ def lt(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
-    # TODO: float??
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -226,8 +234,6 @@ def gt(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
-    # TODO: float??
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -242,8 +248,6 @@ def eq(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
-    # TODO: float??
     # runtime type check
     if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -294,7 +298,6 @@ def int2char(ins_order: int, args: list):
     if op1.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
 
-
     # ord function range check
     if op1.value not in range(UNICODE_MAX_VAL + 1):
         sys.exit(ErrorCode.RUNTIME_STRING_HANDLING)
@@ -307,11 +310,9 @@ def stri2int(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
     # runtime type check
     if op1.type != 'string' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
-
 
     # index range check
     if op2.value not in range(len(op1.value)):
@@ -320,11 +321,31 @@ def stri2int(ins_order: int, args: list):
     var.value = ord()
     return ins_order + 1
 
+def int2float(ins_order: int, args: list):
+    var: Variable = CoreData.get_variable(args[0].value)
+    op1 = CoreData.get_symbol(args[1])
+
+    if op1.type != 'int':
+        sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
+
+    var.value = float(op1.value)
+    return ins_order + 1
+
+def float2int(ins_order: int, args: list):
+    var: Variable = CoreData.get_variable(args[0].value)
+    op1 = CoreData.get_symbol(args[1])
+
+    if op1.type != 'float':
+        sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
+
+    var.value = int(op1.value)
+    return ins_order + 1
+
 def read(ins_order: int, args: list):
     var: Variable = CoreData.get_variable(args[0].value)
 
     # data type
-    op1.value = args[1].value
+    op1 = CoreData.get_symbol(args[1])
 
     if op1.value == 'string':
         var.value = input()
@@ -333,6 +354,11 @@ def read(ins_order: int, args: list):
     elif op1.value == 'int':
         try:
             var.value = int(input())
+        except:
+            var.value = None
+    elif op1.value == 'float':
+        try:
+            var.value = float(input())
         except:
             var.value = None
     else:
@@ -357,7 +383,6 @@ def concat(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
     # runtime type check
     if op1.type != 'string' or op2.type != 'string':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -381,11 +406,9 @@ def getchar(ins_order: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     op2 = CoreData.get_symbol(args[2])
 
-
     # runtime type check
     if op1.type != 'string' or op2.type != 'int':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
-
 
     # index range check
     if op2.value not in range(len(op1.value)):
@@ -402,7 +425,6 @@ def setchar(ins_order: int, args: list):
     # runtime type check
     if var.type != 'string' or op1.type != 'int' or op2.type != 'string':
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
-
 
     # index range check
     if op1.value not in range(len(var.value)) or len(op2.value) == 0:
@@ -450,8 +472,6 @@ def jumpifeq(ins_order: int, args: list):
     if index_if_true is None:
         sys.exit(ErrorCode.SEMANTIC_ERROR)
 
-
-    # TODO: float??
     # runtime type check
     if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -468,8 +488,6 @@ def jumpifneq(ins_order: int, args: list):
     if index_if_true is None:
         sys.exit(ErrorCode.SEMANTIC_ERROR)
 
-
-    # TODO: float??
     # runtime type check
     if op1.type != op2.type and (op1.type != 'nil' or op2.type != 'nil'):
         sys.exit(ErrorCode.RUNTIME_WRONG_TYPE)
@@ -550,6 +568,8 @@ instruct_set = {
         'NOT' : not_i,
         'INT2CHAR' : int2char,
         'STRI2INT' : stri2int,
+        'INT2FLOAT' : int2float,
+        'FLOAT2INT' : float2int,
         'READ' : read,
         'WRITE' : write,
         'CONCAT' : concat,

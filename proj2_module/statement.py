@@ -3,49 +3,48 @@ import sys
 from .error import ErrorCode
 from .coredata import CoreData
 
-class Argument:
-
-    def __init__(self, arg):
-        self.type = arg[0]
-        if self.type == 'string':
-            self._format_string(arg[1])
-        elif self.type in ('var', 'label', 'type'):
-            self.value = arg[1]
-        elif self.type == 'bool':
-            self.value = arg[1] == 'true'
-        elif self.type == 'int':
-            self.value = int(arg[1])
-        elif self.type == 'float':
-            pass # TODO: float
-        else:   # nil type
-            self.value = None
-
-    def _format_string(self, str_val: str):
-        """ Format string into printable value """
-
-        def ascii_to_str(match_obj):
-            """ Convert \XXX format into ascii_char_value """
-            ascii_value = int(match_obj.group(0)[1:])
-            return chr(ascii_value)
-
-        if str_val is None:
-            self.value = ''
-        else:
-            self.value = re.sub(r'\\\d{3}', ascii_to_str, str_val)
-
-    def __str__(self):
-        return f"\ntype: {self.type}, value: {self.value}"
-
-    def __repr__(self):
-        return str(self)
-
-
 class Statement:
+
+    class Argument:
+
+        def __init__(self, arg):
+            self.type = arg[0]
+            if self.type == 'string':
+                self._format_string(arg[1])
+            elif self.type in ('var', 'label', 'type'):
+                self.value = arg[1]
+            elif self.type == 'bool':
+                self.value = arg[1] == 'true'
+            elif self.type == 'int':
+                self.value = int(arg[1])
+            elif self.type == 'float':
+                self.value = float.fromhex(arg[1])
+            else:   # nil type
+                self.value = None
+
+        def _format_string(self, str_val: str):
+            """ Format string into printable value """
+
+            def ascii_to_str(match_obj):
+                """ Convert \XXX format into ascii_char_value """
+                ascii_value = int(match_obj.group(0)[1:])
+                return chr(ascii_value)
+
+            if str_val is None:
+                self.value = ''
+            else:
+                self.value = re.sub(r'\\\d{3}', ascii_to_str, str_val)
+
+        def __str__(self):
+            return f"\ntype: {self.type}, value: {self.value}"
+
+        def __repr__(self):
+            return str(self)
 
     def __init__(self, ins, order: int, args: list):
         self.ins   = ins
         self.order = order
-        self.args  = [Argument(arg) for arg in args]
+        self.args  = [self.Argument(arg) for arg in args]
 
         if ins == 'LABEL':
             label_name = self.args[0].value
