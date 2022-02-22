@@ -3,48 +3,55 @@ import sys
 import xml.etree.ElementTree as ET
 
 from proj2_module.statement import Statement
-from proj2_module.coredata import CoreData, instruct_set
+from proj2_module.coredata import CoreData
+from proj2_module.instruction_set import *
+from proj2_module.arguments import *
 
-""" TODO:
-    1. load arguments
-    2. parse xml file
-    3. sort it
-    4. do command
-        - semantic check
-    5. exit code
+instruct_set = {
+        'MOVE' : move,
+        'CREATEFRAME' : createframe,
+        'PUSHFRAME' : pushframe,
+        'POPFRAME' : popframe,
+        'DEFVAR' : defvar,
+        'CALL' : call,
+        'RETURN' : return_i,
+        'PUSHS' : pushs,
+        'POPS' : pops,
+        'ADD' : add,
+        'SUB' : sub,
+        'MUL' : mul,
+        'DIV' : div,
+        'IDIV' : idiv,
+        'LT' : lt,
+        'GT' : gt,
+        'EQ' : eq,
+        'AND' : and_i,
+        'OR' : or_i,
+        'NOT' : not_i,
+        'INT2CHAR' : int2char,
+        'STRI2INT' : stri2int,
+        'INT2FLOAT' : int2float,
+        'FLOAT2INT' : float2int,
+        'READ' : read,
+        'WRITE' : write,
+        'CONCAT' : concat,
+        'STRLEN' : strlen,
+        'GETCHAR' : getchar,
+        'SETCHAR' : setchar,
+        'TYPE' : type_i,
+        'LABEL' : label,
+        'JUMP' : jump,
+        'JUMPIFEQ' : jumpifeq,
+        'JUMPIFNEQ' : jumpifneq,
+        'EXIT' : exit_i,
+        'DPRINT' : dprint,
+        'BREAK' : break_i
+        }
 
-    What do I need:
-    lof_labels -> number of order
-        -> for jumps
-
-    scopes as class??
-    global_scope |
-    local_scope  |--> name, type and value it holds
-    temp_scope   |
-
-    lof_instructions -> function on it
-        -> dictionary
-
-    class for variable
-        name
-        type
-        value
-
-    file for constants???
-
-    enum errors
-
-    extended version:
-    stack
-    float
-    stats
-        -> class
-
-"""
-
-def xml_parser(xml_path: str) -> list:
+def xml_parser() -> list:
     lof_ins = []
     # TODO: check if file exists
+    xml_path = sys.stdin if CoreData.source_file is None else CoreData.source_file
     tree = ET.parse(xml_path)
     program = tree.getroot()
 
@@ -66,7 +73,8 @@ def xml_parser(xml_path: str) -> list:
 
 def main() -> int:
     # TODO: arguments
-    lof_ins = xml_parser("./tmp.xml")
+    arg_process()
+    lof_ins = xml_parser()
     lof_ins.sort(key=(lambda statement: statement.order))
 
     nof_ins = len(lof_ins)
@@ -76,9 +84,6 @@ def main() -> int:
         ins_index = instruct_set[stat.ins](ins_index, stat.args)
         CoreData.ins_performed += 1
 
-    # for ins in lof_ins:
-    #     print(ins)
-    # return 0
 
 if __name__ == "__main__":
     exit(main());
