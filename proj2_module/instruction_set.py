@@ -89,7 +89,6 @@ def pushs(ins_order: int, args: list):
     else:
         value = args[0].value
 
-    # TODO: uninitialized variable
     CoreData.stack_vals.append(value)
     return ins_order + 1
 
@@ -372,7 +371,7 @@ def read(ins_order: int, args: list):
         except:
             var.value = None
     else:
-        sys.exit(ErrorCode.RUNTIME_WRONG_VALUE) # TODO: what??
+        sys.exit(ErrorCode.RUNTIME_WRONG_VALUE)
 
     return ins_order + 1
 
@@ -381,6 +380,9 @@ def write(ins_order: int, args: list):
         WRITE <symb>
     """
     symb = CoreData.get_symbol(args[0])
+
+    if symb.type == 'UNDEF':
+        sys.exit(ErrorCode.RUNTIME_MISSING_VALUE)
 
     if symb.type == 'nil':
         print('', end='', flush=True)

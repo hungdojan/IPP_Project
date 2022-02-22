@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from proj2_module.statement import Statement
 from proj2_module.coredata import CoreData
 from proj2_module.instruction_set import *
-from proj2_module.arguments import *
+from proj2_module.arguments import arg_process
 
 instruct_set = {
         'MOVE' : move,
@@ -67,6 +67,10 @@ def xml_parser() -> list:
                 break
             args.append((arg.get('type'), arg.text))
         lof_ins.append(Statement(opcode, order, args))
+
+    if len(CoreData.undef_labels) > 0:
+        # TODO: write output to stderr
+        sys.exit(ErrorCode.SEMANTIC_ERROR)
 
     return lof_ins
 

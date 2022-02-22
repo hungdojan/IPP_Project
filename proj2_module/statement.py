@@ -52,6 +52,15 @@ class Statement:
                 sys.exit(ErrorCode.SEMANTIC_ERROR)
             CoreData.labels[label_name] = order
 
+            # remove from undefined label if exists
+            if label_name in CoreData.undef_labels:
+                CoreData.undef_labels.remove(label_name)
+
+        elif ins in ('JUMP', 'JUMPIFEQ', 'JUMPIFNEQ', 'CALL'):
+            # add label to undefined label if label doesn't exists yet
+            if CoreData.labels.get(self.args[0].value) is None:
+                CoreData.undef_labels.append(self.args[0].value)
+
 
     def __str__(self):
         return f"{self.ins}, {self.order}, {self.args}"

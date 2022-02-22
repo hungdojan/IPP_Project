@@ -12,6 +12,7 @@ class CoreData:
     temp_frame: Frame   = None
     local_frame: Frame  = None
     labels = {}
+    undef_labels = []
     ins_performed = 0
 
     stack_func = []
