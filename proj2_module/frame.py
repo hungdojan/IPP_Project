@@ -21,12 +21,12 @@ class Variable:
         self._value = value
         if value is None:
             self._type = 'nil'
+        elif isinstance(value, bool):
+            self._type = 'bool'
         elif isinstance(value, int):
             self._type = 'int'
         elif isinstance(value, str):
             self._type = 'string'
-        elif isinstance(value, bool):
-            self._type = 'bool'
         elif isinstance(value, float):
             self._type = 'float'
         else:

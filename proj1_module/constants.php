@@ -12,12 +12,12 @@
 $REG_STR = array(
     'var'     => "(GF|LF|TF)@[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*",
     'str'     => '(string@(([^\s#\\\\]|\\\\\d{3})+|(?=\W|$)))',
-    'int'     => "int@[-]?\d+",
+    'int'     => "int@[+-]?\d+",
     'bool'    => "bool@(true|false)",
     'nil'     => "nil@nil",
     'label'   => "[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*",
     'type'    => "(int|bool|string)",
-    'header'  => "\.IPPcode22",
+    'header'  => "\.IPPcode22(?=\W|$)",
     'comment' => "#.*"
 );
 $REG_STR['symb'] = "($REG_STR[var]|$REG_STR[str]|$REG_STR[int]|$REG_STR[bool]|$REG_STR[nil])";

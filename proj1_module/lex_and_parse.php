@@ -28,6 +28,7 @@ function parser($stats=null)
     $line_count = 0;
 
     $header = false;
+    # header check
     while ( ($line = fgets(STDIN)) )
     {
         $line_count++;
@@ -45,10 +46,10 @@ function parser($stats=null)
             continue;
 
         // check for header
-        if (preg_match("/$REG_STR[header]/", $line))
+        if (preg_match("/^$REG_STR[header]/", $line))
         {
             $header = true;
-            continue;
+            break;
         }
 
         // header must appear before any instruction
@@ -58,6 +59,23 @@ function parser($stats=null)
             error_log("Chybi hlavicka .IPPcode22 ve zdrojovem kodu!");
             exit(ErrorCode::MISSING_HEADER->value);
         }
+    }
+
+    while ( ($line = fgets(STDIN)) )
+    {
+        $line_count++;
+        $line = trim($line);
+        if (preg_match("/$REG_STR[comment]/", $line))
+        {
+            // increment number of comments and remove it
+            if (!is_null($stats))
+                $stats->inc_comments();
+            $line = preg_replace("/$REG_STR[comment]/", "\n", $line);
+        }
+
+        // empty line
+        if (preg_match("/^\s*$/", $line))
+            continue;
 
         // error validation variables
         $valid_cmd = false;

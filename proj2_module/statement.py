@@ -50,7 +50,7 @@ class Statement:
             label_name = self.args[0].value
             if CoreData.labels.get(label_name) is not None:
                 sys.exit(ErrorCode.SEMANTIC_ERROR)
-            CoreData.labels[label_name] = order
+            CoreData.labels[label_name] = 0
 
             # remove from undefined label if exists
             if label_name in CoreData.undef_labels:
