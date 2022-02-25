@@ -211,7 +211,9 @@ Invalid tag name, arg1/arg2/arg3 expected""",
             table_args[args_element.tag] = (args_element.get('type'), args_element.text)
 
         args = argument_attr_check(table_args)
-        lof_ins.append(Statement(opcode, order, args))
+        stat = Statement(opcode, order, args)
+        CoreData.update_label_data(stat)
+        lof_ins.append(stat)
 
     # check for jumps to undefined labels and duplicates
     if len(CoreData.undef_labels) > 0:

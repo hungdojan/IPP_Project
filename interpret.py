@@ -6,8 +6,6 @@ from proj2_module.arguments import arg_process
 from proj2_module.xml_parser import xml_parser
 from proj2_module.instruction_set import instruct_set
 
-
-
 def main() -> int:
     # TODO: arguments
     arg_process()
@@ -24,4 +22,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    exit(main());
+    exit(main())

@@ -7,8 +7,7 @@ Module: proj2_module
 import sys
 from .error import ErrorCode
 from .frame import Frame, Variable
-
-UNICODE_MAX_VAL = 1,114,111
+from .statement import Statement, Argument
 
 class CoreData:
     input_file = None
@@ -49,65 +48,94 @@ class CoreData:
 
         # get frame from variable prefix
         if var_name.startswith('GF@'):
-            cls.global_frame.add_variable(simplified_name)
+            new_var = cls.global_frame.add_variable(simplified_name)
         elif var_name.startswith('LF@'):
             if cls.local_frame is None:
-                sys.exit(ErrorCode.RUNTIME_NONEXIST_FRAME)
-            cls.local_frame.add_variable(simplified_name)
+                ErrorCode.exit_error(
+                        f"Error while calling variable {var_name}\n"
+                        "Local frame does not exists.",
+                        ErrorCode.RUNTIME_NONEXIST_FRAME)
+            new_var = cls.local_frame.add_variable(simplified_name)
         else:
             if cls.temp_frame is None or not cls.temp_frame.is_active:
-                sys.exit(ErrorCode.RUNTIME_NONEXIST_FRAME)
-            cls.temp_frame.add_variable(simplified_name)
+                ErrorCode.exit_error(
+                        f"Error while calling variable {var_name}\n"
+                        "Temporary frame does not exists.",
+                        ErrorCode.RUNTIME_NONEXIST_FRAME)
+            new_var = cls.temp_frame.add_variable(simplified_name)
+
+        if new_var is None:
+            ErrorCode.exit_error(
+                    "Error while creating new variable:\n"
+                    f"Variable {var_name} already exists",
+                    ErrorCode.SEMANTIC_ERROR)
 
     @classmethod
-    def get_variable(cls, var_name: str):
+    def get_variable(cls, var_name: str) -> Variable:
         """Returns stored variable from frame
 
         Check variable name's prefix and decides, which frame to look in for.
         Terminate program with ErrorCode.RUNTIME_NONEXIST_FRAME if frame is
-        not 
+        not initialized.
+        Terminate program with ErrorCode.RUNTIME_UNDEF_VAR if variable was not
+        defined within the frame.
 
         Parameters:
         var_name (str): Variable name
 
+        Returs:
+        Variable: Found Variable instance
         """
         simplified_name = Variable.simplify_var_name(var_name)
+        var = None
 
         # get frame from variable prefix
         if var_name.startswith('GF@'):
-            return cls.global_frame.get_var(simplified_name)
+            var = cls.global_frame.get_var(simplified_name)
         elif var_name.startswith('LF@'):
             if cls.local_frame is None:
-                sys.exit(ErrorCode.RUNTIME_NONEXIST_FRAME)
-            return cls.local_frame.get_var(simplified_name)
+                ErrorCode.exit_error(
+                        f"Error while calling variable {var_name}\n"
+                        "Local frame does not exists.",
+                        ErrorCode.RUNTIME_NONEXIST_FRAME)
+            var = cls.local_frame.get_var(simplified_name)
         else:
             if cls.temp_frame is None or not cls.temp_frame.is_active:
-                sys.exit(ErrorCode.RUNTIME_NONEXIST_FRAME)
-            return cls.temp_frame.get_var(simplified_name)
+                ErrorCode.exit_error(
+                        f"Error while calling variable {var_name}\n"
+                        "Temporary frame does not exists.",
+                        ErrorCode.RUNTIME_NONEXIST_FRAME)
+            var = cls.temp_frame.get_var(simplified_name)
+
+        if var is None:
+            ErrorCode.exit_error(
+                f"Error: Variable {var_name} has not been defined",
+                ErrorCode.RUNTIME_UNDEF_VAR)
+        return var
+            
 
     @classmethod
-    def get_symbol(cls, argument):
+    def get_symbol(cls, argument: Argument) -> Argument:
         """Return a symbol (variable or constant) from argument
 
         Parameters:
         argument (Argument): Instance of argument
 
         Returns:
-        TODO:
+        Argument: Extracted symbol from argument (variable or constant)
         """
         if argument.type == 'var':
             var: Variable = cls.get_variable(argument.value)
             return var
-        else:
-            return argument
+        return argument
 
     @classmethod
-    def get_line(cls):
+    def get_line(cls) -> str:
         """Return read data from stdin or input file
 
         Returns:
         str: Read data
-        
+
         """
         if cls.input_file is None:
             return input()
@@ -115,9 +143,68 @@ class CoreData:
 
 
     @classmethod
-    def set_jumps(cls, lof_ins):
-        """Set jump destinations to labels"""
+    def set_jumps(cls, lof_ins: list):
+        """Set jump destinations to labels
+
+        Search for LABEL instruction in sorted list of instructions and create
+        new {key: value} relationship of {label_name, index_of_instruction}.
+
+        Parameters:
+        lof_ins (list): List of instructions (Statement) extracted from XML file
+
+        """
         for i in range(len(lof_ins)):
             stat = lof_ins[i]
             if stat.ins == 'LABEL':
+                # jump one forward (instruction after label)
                 cls.labels[stat.args[0].value] = i+1
+
+    @classmethod
+    def update_label_data(cls, stat: Statement):
+        """Update label-instruction related data
+
+        Parameters:
+        stat (Statement): Processing instruction
+
+        """
+        if stat.ins == 'LABEL':
+            label_name = stat.args[0].value
+            if cls.labels.get(label_name) is not None:
+                sys.exit(ErrorCode.SEMANTIC_ERROR)
+            cls.labels[label_name] = 0
+
+            # remove from undefined label if exists
+            if label_name in cls.undef_labels:
+                cls.undef_labels.remove(label_name)
+
+        elif stat.ins in ('JUMP', 'JUMPIFEQ', 'JUMPIFNEQ', 'CALL'):
+            # add label to undefined label if label doesn't exists yet
+            if cls.labels.get(stat.args[0].value) is None:
+                cls.undef_labels.append(stat.args[0].value)
+
+    @classmethod
+    def stack_push(cls, value):
+        """Push value to the data stack
+
+        Parameters:
+        value (any): Constant value
+
+        """
+        cls.stack_vals.append(value)
+
+    @classmethod
+    def stack_pop(cls):
+        """Pop value from the data stack
+
+        Terminate program with ErrorCode.RUNTIME_MISSING_VALUE when
+        stack is empty.
+
+        Returns:
+        Variable: Value from stack stored in temporary value
+
+        """
+        if len(cls.stack_vals) < 1:
+            ErrorCode.exit_error("Stack is empty", ErrorCode.RUNTIME_MISSING_VALUE)
+        temp_var = Variable()
+        temp_var.value = cls.stack_vals.pop()
+        return temp_var
