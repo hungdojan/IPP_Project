@@ -73,9 +73,10 @@ class Statement:
 
 
     def __str__(self):
-        return "{}: {}\t|{}".format(self.order,
-                                    self.ins,
-                                    ' '.join(self.args))
+        output_msg = f"{self.order}: {self.ins}"
+        for arg in self.args:
+            output_msg += f" {arg}"
+        return output_msg
 
     def __repr__(self):
         return str(self)

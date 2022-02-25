@@ -85,7 +85,7 @@ def root_element_validation(root: ET.Element) -> bool:
         return True
     return False
 
-def inst_element_validation(inst: ET.Element, order_used: list) -> (str, int):
+def inst_element_validation(inst: ET.Element, order_used: list) -> tuple[str, int]:
     """Check element 'instruction' structure 
 
     Terminate program with code ErrorCode.XML_STRUCTURE_ERROR
@@ -101,41 +101,41 @@ def inst_element_validation(inst: ET.Element, order_used: list) -> (str, int):
     """
     if inst.tag != 'instruction':
         ErrorCode.exit_error(
-                f"""Error occured while loading instruction element:
-Expected element tag: instruction
-Received element tag: {inst.tag}""",
+                "Error occured while loading instruction element:"
+                "Expected element tag: instruction"
+                "Received element tag: {inst.tag}",
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     if inst.get('opcode') is None:
         ErrorCode.exit_error(
-                """Error occured while loading instruction element:
-Missing attribute 'opcode'!""",
+                "Error occured while loading instruction element:"
+                "Missing attribute 'opcode'!",
                 ErrorCode.XML_STRUCTURE_ERROR)
     # formatting code for later use
     opcode = inst.get('opcode').upper()
     if instruct_set.get(opcode) is None:
         ErrorCode.exit_error(
-                f"""Error occured while loading instruction element:
-Undefined operation code {opcode}""",
+                "Error occured while loading instruction element:"
+                f"Undefined operation code {opcode}",
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     if inst.get('order') is None:
         ErrorCode.exit_error(
-                """Error occured while loading instruction element:
-Missing attribute 'order'!""",
+                "Error occured while loading instruction element:"
+                "Missing attribute 'order'!",
                 ErrorCode.XML_STRUCTURE_ERROR)
     try:
         order = int(inst.get('order'))
     except:
         ErrorCode.exit_error(
-                """Error occured while loading instruction element:
-Wrong order data type, int value expected!""",
+                "Error occured while loading instruction element:"
+                "Wrong order data type, int value expected!",
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     if order < 1:
         ErrorCode.exit_error(
-                """Error occured while loading instruction element:
-Value of attribute order is invalid!""",
+                "Error occured while loading instruction element:"
+                "Value of attribute order is invalid!",
                 ErrorCode.XML_STRUCTURE_ERROR)
     order_used.append(order)
 
@@ -160,8 +160,8 @@ def argument_attr_check(table_args: dict) -> list:
         (len(keys) > 1 and 'arg2' not in keys) or
         (len(keys) > 2 and 'arg3' not in keys)):
         ErrorCode.exit_error(
-                """Error while loading argument elements:
-Argument sequence is invalid""",
+                "Error while loading argument elements:"
+                "Argument sequence is invalid",
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     for key in sorted(table_args.keys()):
@@ -200,8 +200,8 @@ def xml_parser() -> list:
         for args_element in inst:
             if not re.match("^arg[1-3]$", args_element.tag):
                 ErrorCode.exit_error(
-                        """Error while loading argument elements:
-Invalid tag name, arg1/arg2/arg3 expected""",
+                        "Error while loading argument elements:"
+                        "Invalid tag name, arg1/arg2/arg3 expected",
                         ErrorCode.XML_STRUCTURE_ERROR)
 
             if format_validation(args_element.get('type'), args_element.text):
