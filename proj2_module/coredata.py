@@ -14,8 +14,8 @@ class CoreData:
     source_file = None
     REG_TYPE = {
             'var': r'(GF|LF|TF)@[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*',
-            'string': '([^\s#\\\\]|\\\\\d{3})+',
-            'float': r'[+-]?(\d*(\.\d))?',
+            'string': r'([^\s#\\]|\\\d{3})*',
+            'float': r'[+-]?\d*(\.\d+)?',
             'float_hex': r'[+-]?(0x)?[01]\.?[0-9a-f]*(p[+-]?[0-9a-f]+)?',
             'int': r'[+-]?\d+',
             'label': '[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*',
@@ -26,7 +26,7 @@ class CoreData:
     temp_frame: Frame   = None
     local_frame: Frame  = None
     labels = {}
-    undef_labels = []
+    undef_labels = set()
     ins_performed = 0
 
     stack_func = []
@@ -180,7 +180,7 @@ class CoreData:
         elif stat.ins in ('JUMP', 'JUMPIFEQ', 'JUMPIFNEQ', 'CALL'):
             # add label to undefined label if label doesn't exists yet
             if cls.labels.get(stat.args[0].value) is None:
-                cls.undef_labels.append(stat.args[0].value)
+                cls.undef_labels.add(stat.args[0].value)
 
     @classmethod
     def stack_push(cls, value):

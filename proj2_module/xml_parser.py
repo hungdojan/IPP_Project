@@ -8,8 +8,6 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-from xml.sax.handler import ContentHandler
-from xml.sax import make_parser
 from proj2_module.statement import Statement
 from proj2_module.coredata import CoreData
 from proj2_module.error import ErrorCode
@@ -32,6 +30,8 @@ def format_validation(dtype: str, value):
         if not re.match(f'^{CoreData.REG_TYPE["var"]}$', value):
             return True
     elif dtype == 'string':
+        if value is None:
+            value = ''
         if not re.match(f'^{CoreData.REG_TYPE["string"]}$', value):
             return True
     elif dtype == 'type':
@@ -41,31 +41,12 @@ def format_validation(dtype: str, value):
         if not re.match(f'^{CoreData.REG_TYPE["label"]}$', value):
             return True
     elif dtype == 'float':
-        if not re.match(f'^({CoreData.REG_TYPE["float"]}|{CoreData.REG_TYPE["float_hex"]})$', value):
+        if not re.match(f'^({CoreData.REG_TYPE["float_hex"]}|{CoreData.REG_TYPE["float"]})$', value):
             return True
     elif dtype == 'int':
         if not re.match(f'^{CoreData.REG_TYPE["int"]}$', value):
             return True
     return False
-
-def xml_format_validation(path: str):
-    """Check if XML file is well-formed
-
-    Terminate program with code ErrorCode.XML_FORMAT_ERROR
-    when error occure.
-
-    Parameters:
-    path (str): Path to XML file
-
-    """
-    parser = make_parser()
-    parser.setContentHandler(ContentHandler())
-    try:
-        parser.parse(path)
-    except:
-        ErrorCode.exit_error(f"XML file '{path}' is not well-formed!",
-                             ErrorCode.XML_FORMAT_ERROR)
-
 
 def root_element_validation(root: ET.Element) -> bool:
     """Check root element struction
@@ -179,9 +160,12 @@ def xml_parser() -> list:
     lof_ins = []
     # TODO: check if file exists
     xml_path = sys.stdin if CoreData.source_file is None else CoreData.source_file
-    xml_format_validation(xml_path)
 
-    tree = ET.parse(xml_path)
+    try:
+        tree = ET.parse(xml_path)
+    except:
+        ErrorCode.exit_error(f"Input XML file is not well-formed!",
+                             ErrorCode.XML_FORMAT_ERROR)
     program = tree.getroot()
     # check root attributes
     if root_element_validation(program):
@@ -217,6 +201,7 @@ def xml_parser() -> list:
 
     # check for jumps to undefined labels and duplicates
     if len(CoreData.undef_labels) > 0:
+        print(CoreData.undef_labels)
         # TODO: write output to stderr
         ErrorCode.exit_error(
                 "Error: Source file contains undefined labels",

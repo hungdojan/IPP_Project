@@ -13,6 +13,7 @@ $REG_STR = array(
     'var'     => "(GF|LF|TF)@[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*",
     'str'     => '(string@(([^\s#\\\\]|\\\\\d{3})+|(?=\W|$)))',
     'int'     => "int@[+-]?\d+",
+    'float'   => "float@[+-]?((0x)?[01]\.?[0-9a-f]*(p[+-]?[0-9a-f]+)?|\d*(\.\d+)?)",
     'bool'    => "bool@(true|false)",
     'nil'     => "nil@nil",
     'label'   => "[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*",
@@ -20,7 +21,7 @@ $REG_STR = array(
     'header'  => "\.IPPcode22(?=\W|$)",
     'comment' => "#.*"
 );
-$REG_STR['symb'] = "($REG_STR[var]|$REG_STR[str]|$REG_STR[int]|$REG_STR[bool]|$REG_STR[nil])";
+$REG_STR['symb'] = "($REG_STR[var]|$REG_STR[str]|$REG_STR[int]|$REG_STR[bool]|$REG_STR[nil]|$REG_STR[float])";
 
 /**
  * Create instruction regex by concatenating elementary regex
@@ -61,6 +62,7 @@ $INS_SET = array(
     'ADD'         => init_regex("add", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
     'SUB'         => init_regex("sub", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
     'MUL'         => init_regex("mul", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
+    'DIV'         => init_regex("div", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
     'IDIV'        => init_regex("idiv", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
     'LT'          => init_regex("lt", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
     'GT'          => init_regex("gt", $REG_STR['var'], $REG_STR['symb'], $REG_STR['symb']),
@@ -88,7 +90,26 @@ $INS_SET = array(
     'EXIT'        => init_regex("exit", $REG_STR['symb']),
                      
     'DPRINT'      => init_regex("dprint", $REG_STR['symb']),
-    'BREAK'       => init_regex("break")
+    'BREAK'       => init_regex("break"),
+
+    // extra
+    'INT2FLOAT'   => init_regex("int2float", $REG_STR['var'], $REG_STR['symb']),
+    'FLOAT2INT'   => init_regex("float2int", $REG_STR['var'], $REG_STR['symb']),
+    'CLEARS'      => init_regex("clears"),
+    'ADDS'        => init_regex("adds"),
+    'SUBS'        => init_regex("subs"),
+    'MULS'        => init_regex("muls"),
+    'IDIVS'       => init_regex("idivs"),
+    'LTS'         => init_regex("lts"),
+    'GTS'         => init_regex("gts"),
+    'EQS'         => init_regex("eqs"),
+    'ANDS'        => init_regex("ands"),
+    'ORS'         => init_regex("ors"),
+    'NOTS'        => init_regex("nots"),
+    'INT2CHARS'   => init_regex("int2chars"),
+    'STRI2INTS'   => init_regex("stri2ints"),
+    'JUMPIFEQS'   => init_regex("jumpifeqs", $REG_STR['label']),
+    'JUMPIFNEQS'  => init_regex("jumpifneqs", $REG_STR['label'])
 );
 /* constants */
 ?>

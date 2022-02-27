@@ -490,7 +490,7 @@ def float2ints(prg_cntr: int, args: list):
 
 def jumpifeqs(prg_cntr: int, args: list):
     """ Jump to <label> if <symb1> is equal to <symb2>
-        JUMPIFEQS
+        JUMPIFEQS <label>
     """
     if len(args) != 1:
         ErrorCode.exit_error(

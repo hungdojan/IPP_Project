@@ -603,7 +603,9 @@ def read(prg_cntr: int, args: list):
         except:
             var.value = None
     else:
-        ErrorCode.exit_error(ErrorCode.RUNTIME_WRONG_VALUE)
+        ErrorCode.exit_error(
+                f"Error while reading input at {prg_cntr+1}. command",
+                ErrorCode.RUNTIME_WRONG_VALUE)
 
     return prg_cntr + 1
 
@@ -926,8 +928,11 @@ def break_i(prg_cntr: int, args: list):
         sys.stderr.write(f"\t{item[0]}: {item[1]}\n")
 
     sys.stderr.write("\nObsah docasneho ramce: \n")
-    for item in CoreData.temp_frame.vars.items():
-        sys.stderr.write(f"\t{item[0]}: {item[1]}\n")
+    if CoreData.temp_frame is None or not CoreData.temp_frame.is_active:
+        sys.stderr.write("\tDocasny ramec je zatim nedefinovany\n\n")
+    else:
+        for item in CoreData.temp_frame.vars.items():
+            sys.stderr.write(f"\t{item[0]}: {item[1]}\n")
 
     sys.stderr.write(f"Pocet vykonanych instrukci: {CoreData.ins_performed}\n")
     sys.stderr.write("================================\n")
