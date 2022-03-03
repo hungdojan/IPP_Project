@@ -82,8 +82,9 @@ def popframe(prg_cntr: int, args: list):
     CoreData.temp_frame.is_active = True
     # set local frame
     if len(CoreData.stack_frames) == 0:
-        ErrorCode.exit_error(f"No frame to pop at {prg_cntr+1}. command",
-                             ErrorCode.RUNTIME_NONEXIST_FRAME)
+        # ErrorCode.exit_error(f"No frame to pop at {prg_cntr+1}. command",
+        #                      ErrorCode.RUNTIME_NONEXIST_FRAME)
+        CoreData.local_frame = None
     else:
         CoreData.local_frame = CoreData.stack_frames[-1]
     return prg_cntr + 1
@@ -126,8 +127,8 @@ def return_i(prg_cntr: int, args: list):
 
     if len(CoreData.stack_func) == 0:
         ErrorCode.exit_error(
-                f"""Wrong number of arguments while executing {prg_cntr+1}. command""",
-                ErrorCode.XML_STRUCTURE_ERROR)
+                f"""Return call from non-existing function while executing {prg_cntr+1}. command""",
+                ErrorCode.RUNTIME_MISSING_VALUE)
 
     prg_cntr = CoreData.stack_func.pop()
     return prg_cntr + 1
@@ -311,7 +312,7 @@ def lt(prg_cntr: int, args: list):
                 "Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
-    var.value = op1.value > op2.value
+    var.value = op1.value < op2.value
     return prg_cntr + 1
 
 def gt(prg_cntr: int, args: list):
@@ -333,16 +334,12 @@ def gt(prg_cntr: int, args: list):
                 f"Missing value while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_MISSING_VALUE)
     # runtime type check
-    if op1.type == 'nil' or op2.type == 'nil':
-        ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
-                ErrorCode.RUNTIME_WRONG_TYPE)
-    if op1.type != op2.type:
+    if op1.type == 'nil' or op2.type == 'nil' or op1.type != op2.type:
         ErrorCode.exit_error(
                 "Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
-    var.value = op1.value < op2.value
+    var.value = op1.value > op2.value
     return prg_cntr + 1
 
 def eq(prg_cntr: int, args: list):
@@ -500,7 +497,7 @@ def stri2int(prg_cntr: int, args: list):
     op2 = CoreData.get_symbol(args[2])
 
     # initialization check
-    if op1.type == 'UNDEF':
+    if op1.type == 'UNDEF' or op2.type == 'UNDEF':
         ErrorCode.exit_error(
                 f"Missing value while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_MISSING_VALUE)
@@ -588,7 +585,7 @@ def read(prg_cntr: int, args: list):
     if op1.value == 'string':
         var.value = input_value
     elif op1.value == 'bool':
-        var.value = (input_value == 'true')
+        var.value = (input_value.lower() == 'true')
     elif op1.value == 'int':
         try:
             var.value = int(input_value)
@@ -735,7 +732,7 @@ def setchar(prg_cntr: int, args: list):
     op2 = CoreData.get_symbol(args[2])
 
     # initialization check
-    if op1.type == 'UNDEF' or op2.type == 'UNDEF':
+    if var.type == 'UNDEF' or op1.type == 'UNDEF' or op2.type == 'UNDEF':
         ErrorCode.exit_error(
                 f"Missing value while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_MISSING_VALUE)
@@ -865,6 +862,12 @@ def exit_i(prg_cntr: int, args: list):
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     symb  = CoreData.get_symbol(args[0])
+
+    # initialization check
+    if symb.type == 'UNDEF':
+        ErrorCode.exit_error(
+                f"Missing value while executing {prg_cntr+1}. command",
+                ErrorCode.RUNTIME_MISSING_VALUE)
 
     # runtime type check
     if symb.type != 'int':

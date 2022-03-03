@@ -201,8 +201,6 @@ def xml_parser() -> list:
 
     # check for jumps to undefined labels and duplicates
     if len(CoreData.undef_labels) > 0:
-        print(CoreData.undef_labels)
-        # TODO: write output to stderr
         ErrorCode.exit_error(
                 "Error: Source file contains undefined labels",
                 ErrorCode.SEMANTIC_ERROR)

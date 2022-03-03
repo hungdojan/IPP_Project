@@ -18,4 +18,7 @@ def arg_process():
     if args.source:
         CoreData.source_file = args.source[0]
     if args.input:
-        CoreData.input_file = open(args.input[0], 'r')
+        # store file content as a list
+        f = open(args.input[0], 'r')
+        CoreData.input_file = f.read().split('\n')
+        f.close()

@@ -11,6 +11,7 @@ from .statement import Statement, Argument
 
 class CoreData:
     input_file = None
+    _line_index = 0
     source_file = None
     REG_TYPE = {
             'var': r'(GF|LF|TF)@[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*',
@@ -138,8 +139,19 @@ class CoreData:
 
         """
         if cls.input_file is None:
-            return input()
-        return cls.input_file.readline().rstrip()
+            try:
+                return input()
+            except:
+                return None
+
+        # reading from the file
+        # file content is stored in list, last item is EOF
+        # increase line counter when new line read
+        if cls._line_index < len(cls.input_file) - 1:
+            ret = cls.input_file[cls._line_index]
+            cls._line_index += 1
+            return ret
+        return None
 
 
     @classmethod
