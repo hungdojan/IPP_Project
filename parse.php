@@ -16,6 +16,7 @@ ini_set('display_errors', 'stderr');
 
 /**
  * Generates list of instructions to XML
+ * Uses XMLWriter library (requires libxml/libxml2 extension).
  *
  * @param lof_ins   List of instruction
  */
@@ -34,16 +35,19 @@ function ins_to_xml($lof_ins)
     xmlwriter_text($xw, 'IPPcode22');
     xmlwriter_end_attribute($xw);
 
+    // push array content into XML instance
     foreach($lof_ins as $index => $item)
         $item->generate_xml($xw, $index+1);
 
     // </program>
     xmlwriter_end_element($xw);
+
+    // output to stdout
     echo xmlwriter_output_memory($xw);
 }
 
 
-// main function
+// main scope
 $stats = Arguments::process_args($argc, $argv);
 $lof_ins = parser($stats);
 ins_to_xml($lof_ins);

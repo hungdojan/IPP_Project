@@ -74,7 +74,7 @@ class Stats
         // checks whether file_path is already in use
         if (in_array($file_path, $this->used_file_names))
         {
-            error_log("Zadany soubor $file_path je jiz pouzivat pro vypis statistik");
+            error_log("File $file_path is already in use");
             exit(ErrorCode::OUT_FILE_ERROR->value);
         }
 
@@ -147,7 +147,7 @@ class Stats
         {
             if ( !($file = fopen($path, "w")) )
             {
-                error_log("Chyba pri otevirani souboru $path");
+                error_log("Error while accessing file $path");
                 exit(ErrorCode::UNDEFINED_ERROR->value);
             }
 

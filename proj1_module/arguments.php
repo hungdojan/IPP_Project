@@ -22,14 +22,20 @@ class Arguments
     /**
      * Extraction of stats options
      * 
-     * Function goes through remaining arguments, validates the syntax
-     * and creates instance of Stats for later source code processing.
+     * New instance of Stats is initialized.
+     * Function divides array of arguments into smaller sections where
+     * each section starts with '--stats' option. Then are validated within sections.
+     * Program is terminated with return code 10 when user used undefined option.
+     *
+     * Section is added to the Stats instance. After function successfully
+     * cycle through all section, object Stats is returned.
      * 
      * @param args List of program arguments without first (executable file) argument
      * @return Stats Instance of Stats
      */
     private static function extract_stats_options($args)
     {
+        // create regular expression by joining PERMITED_FLAGS with '|' sign
         $REGEX_FLAGS = implode('|', self::$PERMITTED_STATS_FLAGS);
         $option = getopt("", ['stats:']);   // for file name extraction
         // position of --stats option in $args
@@ -81,25 +87,30 @@ class Arguments
     {
         // TODO: usage of -h option for help
         $usage_msg = <<<EOT
-        Program slouzici k prepisu zdrojoveho kodu IPPcode22 do XML zapisu.
-        Pouziti:
-            php parser.php [--help]
-            php parser.php [--stats=file1 OPTIONS_1] [--stats=file2 OPTIONS_2] ...
+        Program converts IPPcode22 source file into XML representation for interpret.py
+        usage:  php parser.php [--help]
+                php parser.php [--stats=file1 OPTIONS_1] [--stats=file2 OPTIONS_2] ...
+                    - OPTIONS_n is list of stats options
 
-        Argumenty:
-            --help          Vypis teto napovedy
-            --stats=file    Vypis statistickych hodnot do souboru file
-        
-        Statisticka nastaveni:
-            --loc           Pocet prikazu ve zdrojovem souboru
-            --comments      Pocet komentari ve zdrojovem souboru
-            --labels        Pocet navesti ve zdrojovem souboru
-            --jumps         Pocet instrukci navratu z volani a instrukci pro skoky ve zdrojovem souboru
-            --fwjumps       Pocet doprednych skoku
-            --backjumps     Pocet zpetnych skoku
-            --badjumps      Pocet skoku na neexistujici navesti
+        options:
+            --help          show this help message and exit
+            --stats=file    creates output file with statistics;
+                            file - output file name
 
-        Prikladna pouziti:
+        Each statistics options starts with --stats flag with defined output file path.
+        After initial --stats flag follows list of statistics flags (list of available
+        flags are written in the next section underneath block). To initialize new statistics add new --stats flag.
+
+        stats flags:
+            --loc           lines of code
+            --comments      number of lines with comments
+            --labels        number of labels
+            --jumps         number of jumps, call and returns
+            --fwjumps       number of forward jumps
+            --backjumps     number of backward jumps
+            --badjumps      number of jumps to undefined labels
+
+        examples:
             php parser.php --help
             php parser.php --stats=file.txt --loc --comments < intput > output
             php parser.php --stats=file1 --loc --stats=file2 --comments\n
@@ -111,7 +122,7 @@ class Arguments
      * Arguments processing
      * 
      * Given parameters $argc and $argv, function processes program arguments
-     * to determine what will output.
+     * to determine what will be outputed.
      * 
      * @param argc Number of arguments (equals global $argc)
      * @param argv List of arguments (equals global $argv)
@@ -128,13 +139,11 @@ class Arguments
 
         // help option
         // no other option must be present
-        // TODO: usage of -h option for help
-        // if (in_array('--help', $args) || in_array('-h', $args))
         if (in_array('--help', $args))
         {
             if (count($args) > 1)
             {
-                error_log("Spatna sekvence parametru! --help parametr nelze kombinovat s zadnym dalsim parametrem!");
+                error_log("Wrong sequence of options! --help option cannot be combined with other options!");
                 exit(ErrorCode::WRONG_PARAMS->value);
             }
             self::print_usage();
@@ -144,7 +153,8 @@ class Arguments
         // list of arguments that don't start with --stats option is an error
         if (!preg_match("/^--stats/", $args[0]))
         {
-            error_log("Spatna sekvence parametru! Pro vypis statistik musi sekce zacit parametrem --stats\nPro napovedu pouzij --help parametr");
+            error_log("Wrong sequence of options! Every statistics instance should start with --stats option\n".
+                "For help use --help option");
             exit(ErrorCode::WRONG_PARAMS->value);
         }
 

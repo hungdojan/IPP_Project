@@ -56,7 +56,7 @@ function parser($stats=null)
         // only empty lines and comments are allowed appear before header
         if (!$header)
         {
-            error_log("Chybi hlavicka .IPPcode22 ve zdrojovem kodu!");
+            error_log("Missing header .IPPcode22 in source file!");
             exit(ErrorCode::MISSING_HEADER->value);
         }
     }
@@ -103,12 +103,12 @@ function parser($stats=null)
         // error checking
         if (!$valid_cmd)
         {
-            error_log("Neznama instrukce!\n\n----- Radek $line_count -----\n$line");
+            error_log("Undefined instruction!\n\n----- Line $line_count -----\n$line");
             exit(ErrorCode::WRONG_COMMAND->value);
         }
         if (!$valid_syntax)
         {
-            error_log("Chybna syntaxe!\n\n----- Radek $line_count -----\n$line");
+            error_log("Syntax error!\n\n----- Line $line_count -----\n$line");
             exit(ErrorCode::UNDEF_LEX_OR_SYNTAX_ERROR->value);
         }
     }
