@@ -10,7 +10,7 @@ from .frame import Frame, Variable
 from .statement import Statement, Argument
 
 class CoreData:
-    input_file = None
+    input_file: list = None
     _line_index = 0
     source_file = None
     REG_TYPE = {
@@ -147,7 +147,7 @@ class CoreData:
         # reading from the file
         # file content is stored in list, last item is EOF
         # increase line counter when new line read
-        if cls._line_index < len(cls.input_file) - 1:
+        if cls._line_index < len(cls.input_file):
             ret = cls.input_file[cls._line_index]
             cls._line_index += 1
             return ret
