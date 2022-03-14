@@ -117,7 +117,7 @@ class Stats
         // jumps
         elseif (preg_match("/^return/i", $command->line))
             $this->jumps++;
-        elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call|return)/i", $command->ins))
+        elseif (preg_match("/^(jump|jumpifeq|jumpifneq|call)/i", $command->ins))
         {
             $label = $command->args[0]->value;
             // already defined label
