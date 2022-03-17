@@ -1,0 +1,99 @@
+/*  rgba(95,167,119,1)   green
+    rgba(254,225,145,1)  yellow
+    rgba(253,128,96,1)   orange
+    rgba(232,66,88,1)    red */
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: large;
+    color: #323232;
+}
+
+a {
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    margin: 0%;
+    margin-top: 5px;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 0%;
+    margin-top: 3px;
+}
+
+
+.testPassed {
+    color: white;
+    background-color: #5fa777;
+    /* background-color: #b0d8a4; */
+    margin: 5px;
+    margin-left: 5em;
+    margin-right: 5em;
+}
+
+.testFailed {
+    color: white;
+    /* background-color: #ff6962; */
+    background-color: #e84258;
+    margin: 5px;
+    margin-left: 5em;
+    margin-right: 5em;
+}
+
+.testContent {
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.goodResult {
+    font-size: 80px;
+    text-align: center;
+    margin-top: 0%;
+    margin-bottom: 0%;
+    padding-top: 0%;
+    padding-bottom: 0%;
+}
+
+.badResult {
+    font-size: 80px;
+    text-align: center;
+    margin-top: 0%;
+    margin-bottom: 0%;
+}
+
+#testResult {
+    border-style: solid;
+    border-color: black;
+    border-width: 3px;
+    margin-left: 3.5em;
+    margin-right: 3.5em;
+}
+
+#resultLeftPanel {
+    width: 50%;
+    font-size: 25px;
+}
+
+#testResultContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#percentage {
+    font-size: 80px;
+    text-align: center;
+    margin-top: 0%;
+    margin-bottom: 0%;
+}
+
+#percentageText {
+    margin: 0%;
+}
+
+.leftPanel {
+    width: 50%;
+}
