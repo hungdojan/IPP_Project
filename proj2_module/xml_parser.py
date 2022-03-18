@@ -66,7 +66,7 @@ def root_element_validation(root: ET.Element) -> bool:
         return True
     return False
 
-def inst_element_validation(inst: ET.Element, order_used: list) -> tuple[str, int]:
+def inst_element_validation(inst: ET.Element, order_used: list):
     """Check element 'instruction' structure 
 
     Terminate program with code ErrorCode.XML_STRUCTURE_ERROR

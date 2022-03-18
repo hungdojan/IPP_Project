@@ -36,6 +36,8 @@ function echo_log($msg, $logfilepath, $write_stderr=false)
  */
 function clean_directory($src_dir)
 {
+    if ($src_dir == '' || $src_dir == null)
+        return;
     // recursively remove directory contents and directory
     $dirs = glob("$src_dir/*", GLOB_ONLYDIR);
     foreach ($dirs as $dir)
