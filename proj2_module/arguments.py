@@ -1,6 +1,10 @@
+"""File processes program's arguments
+
+Author: Hung Do
+File:   arguments.py
+Module: proj2_module
+"""
 import argparse
-import sys
-from .error import ErrorCode
 from .coredata import CoreData
 
 def arg_process():

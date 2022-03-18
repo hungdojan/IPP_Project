@@ -155,7 +155,7 @@ def add(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value + op2.value
@@ -184,7 +184,7 @@ def sub(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value - op2.value
@@ -212,7 +212,7 @@ def mul(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value * op2.value
@@ -240,7 +240,7 @@ def div(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # div zero check
@@ -273,7 +273,7 @@ def idiv(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # div zero check
@@ -305,11 +305,11 @@ def lt(prg_cntr: int, args: list):
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
     if op1.type != op2.type:
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value < op2.value
@@ -336,7 +336,7 @@ def gt(prg_cntr: int, args: list):
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil' or op1.type != op2.type:
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value > op2.value
@@ -363,7 +363,7 @@ def eq(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value == op2.value
@@ -391,7 +391,7 @@ def and_i(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool' or op2.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value and op2.value
@@ -419,7 +419,7 @@ def or_i(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool' or op2.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value or op2.value
@@ -445,7 +445,7 @@ def not_i(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = not op1.value
@@ -471,12 +471,12 @@ def int2char(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # ord function range check
     if op1.value not in range(UNICODE_MAX_VAL + 1):
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                              ErrorCode.RUNTIME_STRING_HANDLING)
 
     var.value = chr(op1.value)
@@ -504,12 +504,12 @@ def stri2int(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'string' or op2.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # index range check
     if op2.value not in range(len(op1.value)):
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                              ErrorCode.RUNTIME_STRING_HANDLING)
 
     var.value = ord(op1.value[op2.value])
@@ -535,7 +535,7 @@ def int2float(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = float(op1.value)
@@ -561,7 +561,7 @@ def float2int(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'float':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = int(op1.value)
@@ -654,7 +654,7 @@ def concat(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'string' or op2.type != 'string':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = op1.value + op2.value
@@ -680,7 +680,7 @@ def strlen(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'string':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     var.value = len(op1.value)
@@ -707,12 +707,12 @@ def getchar(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'string' or op2.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # index range check
     if op2.value not in range(len(op1.value)):
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                              ErrorCode.RUNTIME_STRING_HANDLING)
 
     var.value = op1.value[op2.value]
@@ -739,12 +739,12 @@ def setchar(prg_cntr: int, args: list):
     # runtime type check
     if var.type != 'string' or op1.type != 'int' or op2.type != 'string':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # index range check
     if op1.value not in range(len(var.value)) or len(op2.value) == 0:
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                              ErrorCode.RUNTIME_STRING_HANDLING)
 
     # ----- setchar ------
@@ -820,7 +820,7 @@ def jumpifeq(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value == op2.value else prg_cntr+1
@@ -847,7 +847,7 @@ def jumpifneq(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value != op2.value else prg_cntr+1
@@ -872,7 +872,7 @@ def exit_i(prg_cntr: int, args: list):
     # runtime type check
     if symb.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # value range check

@@ -84,7 +84,7 @@ def adds(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value + op2.value)
@@ -111,7 +111,7 @@ def subs(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value - op2.value)
@@ -138,7 +138,7 @@ def muls(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value * op2.value)
@@ -165,7 +165,7 @@ def divs(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # div zero check
@@ -198,7 +198,7 @@ def idivs(prg_cntr: int, args: list):
     if (op1.type not in ('int', 'float') or op2.type not in ('int', 'float')
         or op1.type != op2.type):
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # div zero check
@@ -230,11 +230,11 @@ def lts(prg_cntr: int, args: list):
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
     if op1.type != op2.type:
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value < op2.value)
@@ -260,11 +260,11 @@ def gts(prg_cntr: int, args: list):
     # runtime type check
     if op1.type == 'nil' or op2.type == 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
     if op1.type != op2.type:
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # value = op1.value < op2.value
@@ -291,7 +291,7 @@ def eqs(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value == op2.value)
@@ -318,7 +318,7 @@ def ands(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool' or op2.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value and op2.value)
@@ -345,7 +345,7 @@ def ors(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool' or op2.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(op1.value or op2.value)
@@ -370,7 +370,7 @@ def nots(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'bool':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(not op1.value)
@@ -395,12 +395,12 @@ def int2chars(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # ord function range check
     if op1.value not in range(UNICODE_MAX_VAL + 1):
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_STRING_HANDLING)
 
     CoreData.stack_push(chr(op1.value))
@@ -427,12 +427,12 @@ def stri2ints(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'string' or op2.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     # index range check
     if op2.value not in range(len(op1.value)):
-        ErrorCode.exit_error("Wrong string handling while executing {prg_cntr+1}. command",
+        ErrorCode.exit_error(f"Wrong string handling while executing {prg_cntr+1}. command",
                              ErrorCode.RUNTIME_STRING_HANDLING)
 
     CoreData.stack_push(ord(op1.value[op2.value]))
@@ -457,7 +457,7 @@ def int2floats(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'int':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(float(op1.value))
@@ -482,7 +482,7 @@ def float2ints(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != 'float':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     CoreData.stack_push(int(op1.value))
@@ -510,7 +510,7 @@ def jumpifeqs(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value == op2.value else prg_cntr + 1
@@ -537,7 +537,7 @@ def jumpifneqs(prg_cntr: int, args: list):
     # runtime type check
     if op1.type != op2.type and op1.type != 'nil' and op2.type != 'nil':
         ErrorCode.exit_error(
-                "Wrong symbol's data type while executing {prg_cntr+1}. command",
+               f"Wrong symbol's data type while executing {prg_cntr+1}. command",
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value != op2.value else prg_cntr + 1
