@@ -8,7 +8,6 @@ class HtmlGenerator
     private static $instance = null;
     private $doc;
     private $body;
-    private $test_counter;
 
     // singleton
     private function __construct()
@@ -47,7 +46,7 @@ class HtmlGenerator
     /**
      * Get test content text
      */
-    private function get_test_content_text($test_instance)
+    private function get_result_paragraph(TestInstance $test_instance)
     {
         $return_code_text = $test_instance->get_return_code() ?
                             "OK" : "FAILED";
@@ -62,9 +61,19 @@ class HtmlGenerator
         $output_msg .= "Output comparison: <b>{$output_cmp_text}</b><br/>\n";
         if (!is_null($test_instance->output_file))
             $output_msg .= "Output file: <a href=\"{$test_instance->output_file}\">See output file</a><br/>\n";
-        if (!is_null($test_instance->other_log))
-            $output_msg .= "Log file: <a href=\"{$test_instance->other_log}\">See log file</a><br/>\n";
         return $output_msg;
+    }
+
+    private function get_log_paragraph(TestInstance $test_instance)
+    {
+        $rc_msg = $test_instance->get_rc_log();
+        $output_msg = $test_instance->get_output_log();
+        $output = $rc_msg;
+        $output .= "===============================<br/><br/>";
+
+        if (!is_null($test_instance->output_result))
+            $output .= $output_msg;
+        return $output;
     }
 
     /**
@@ -84,13 +93,17 @@ class HtmlGenerator
         $h2 = $div->childNodes[1];
         $h2->nodeValue = $test_instance->test_name;
 
-        //set test content (message)
-        $p = $div->childNodes[3]->childNodes[1]->childNodes[1];
+        // set test content (message)
+        $p_res = $div->childNodes[3]->childNodes[1]->childNodes[1];
         $inner_text = $doc->createDocumentFragment();
-        $inner_text->appendXML($this->get_test_content_text($test_instance));
+        $inner_text->appendXML($this->get_result_paragraph($test_instance));
+        $p_res->appendChild($inner_text);
 
-        // $p->nodeValue = $this->get_test_content_text($test_instance);
-        $p->appendChild($inner_text);
+        // log content
+        $p_log = $div->childNodes[3]->childNodes[1]->childNodes[3];
+        $log_text = $doc->createDocumentFragment();
+        $log_text->appendXML($this->get_log_paragraph($test_instance));
+        $p_log->appendChild($log_text);
 
         $this->body->appendChild($this->doc->importNode($div, true));
         
@@ -132,6 +145,7 @@ class HtmlGenerator
 
         // percentage
         $percentage->appendChild($doc->createTextNode("$percentage_val %"));
+        // $percentage->setAttribute('style', "color: $color");
 
         $this->body->appendChild($this->doc->importNode($div, true));
     }

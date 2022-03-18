@@ -68,13 +68,15 @@ h2 {
     border-style: solid;
     border-color: black;
     border-width: 3px;
-    margin-left: 3.5em;
-    margin-right: 3.5em;
+    border-radius: 30px;
+    margin-left: 20%;
+    margin-right: 20%;
 }
 
 #resultLeftPanel {
     width: 50%;
-    font-size: 25px;
+    font-size: 26px;
+    margin: 0%;
 }
 
 #testResultContent {
@@ -91,9 +93,16 @@ h2 {
 }
 
 #percentageText {
+    width:225px;
     margin: 0%;
 }
 
 .leftPanel {
-    width: 50%;
+    width: 70%;
+    font-size: larger;
+}
+
+.log {
+    font-family: Lucida Sans Typewriter,Lucida Console,monaco,Bitstream Vera Sans Mono,monospace;
+    font-size: 12px;
 }

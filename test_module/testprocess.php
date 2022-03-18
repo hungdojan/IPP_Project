@@ -9,12 +9,15 @@
  */
 
 require_once "testinfo.php";
+require_once "testinstance.php";
+require_once "html_generator.php";
 
 class TestProcess
 {
     public $output_dir;
     public $output_file;
     public $ti;
+    public $lof_tests;
 
     /**
      * Class constructor
@@ -22,11 +25,12 @@ class TestProcess
      * @param output_dir    Path to directory to create test outputs
      * @param output_file   Name of final output file
      */
-    public function __construct($output_dir='.tmp', $output_file='test_out')
+    public function __construct($output_dir='test_build', $output_file='test_out')
     {
         $this->output_dir = $output_dir;
         $this->output_file = $output_file;
         $this->ti = new TestInfo($output_dir);
+        $this->lof_tests = [];
     }
 
     /**
@@ -47,12 +51,13 @@ class TestProcess
      * @param filename Path to '.src' path name
      * @return Array of useful file paths
      */
-    private function generate_test_filepaths($filename)
+    private function generate_test_filepaths($filename, $parent_dir)
     {
         $file_pi = pathinfo($filename);
         $files = [
             'filename' => $file_pi['filename'],
             'test_dir' => "$this->output_dir/$file_pi[filename]",
+            'testname' => "$parent_dir - $file_pi[filename]",
             'src'      => "$file_pi[dirname]/$file_pi[filename].src",
             'in'       => "$file_pi[dirname]/$file_pi[filename].in",
             'out'      => "$file_pi[dirname]/$file_pi[filename].out",
@@ -70,6 +75,10 @@ class TestProcess
         // create .in file
         if (!file_exists($files['in']))
             shell_exec("touch $files[in]");
+
+        // create .out file
+        if (!file_exists($files['out']))
+            shell_exec("touch $files[out]");
         return $files;
     }
 
@@ -96,22 +105,36 @@ class TestProcess
      * @param exp_rc  Expected return code
      * @return 'true' when test session ends 
      */
-    private function compare_rc($rc, $exp_rc, $logfile)
+    private function compare_rc($rc, $exp_rc, $t_ins)
     {
-        echo_log("Return code test: ", $logfile);
+        // echo_log("Return code test: ", $logfile);
+        // if ($rc != $exp_rc)
+        // {
+        //     echo_log("FAILED\nExpected $exp_rc, received $rc\n", $logfile);
+        //     echo_log("===============================\n\n", $logfile);
+        //     return true;
+        // }
+        // echo_log("OK\n", $logfile);
+        // if ($rc != 0)
+        // {
+        //     $this->ti->nof_passed++;
+        //     echo_log("===============================\n\n", $logfile);
+        //     return true;
+        // }
+        // return false;
+        $t_ins->ret_code = $rc;
+        $t_ins->exp_ret_code = $exp_rc;
         if ($rc != $exp_rc)
         {
-            echo_log("FAILED\nExpected $exp_rc, received $rc\n", $logfile);
-            echo_log("===============================\n\n", $logfile);
+            $t_ins->add_rc_log("Expected $exp_rc, received $rc\n");
             return true;
         }
-        echo_log("OK\n", $logfile);
         if ($rc != 0)
         {
             $this->ti->nof_passed++;
-            echo_log("===============================\n\n", $logfile);
             return true;
         }
+        $t_ins->add_rc_log("\n");
         return false;
     }
 
@@ -122,25 +145,21 @@ class TestProcess
      *
      * @param exp_output_path Path to expected test's output
      */
-    private function compare_xml($exp_output_path, $output_path, $logfile)
+    private function compare_xml($exp_output_path, $output_path, TestInstance $t_ins)
     {
-        echo_log("XML comparison test: ", $logfile);
-        $exec_cmd = "java -jar ".$this->ti->jexampath."jexamxml.jar $output_path/$this->output_file " .
-            "$exp_output_path $output_path/diff.err ".$this->ti->jexampath."options 2>/dev/null | tail -1";
+        $exec_cmd = "java -jar {$this->ti->jexampath}jexamxml.jar $output_path/$this->output_file " .
+            "$exp_output_path $output_path/diff.err {$this->ti->jexampath}options 2>/dev/null";
 
+        $t_ins->add_output_log("$exec_cmd\n");
 
         exec($exec_cmd, $output, $rc);
-        if ($output[0] != "Two files are identical")
-        {
-            echo_log("FAILED (Two XML files are not identical)\n", $logfile);
-            echo_log($output, $logfile);
-        }
-        else
-        {
-            echo_log("OK\n", $logfile);
+        $result = count($output) > 2 && $output[2] == "Two files are identical";
+        if ($result)
             $this->ti->nof_passed++;
-        }
-        echo_log("===============================\n\n", $logfile);
+
+        $t_ins->add_output_log($output);
+        $t_ins->add_output_log("\n");
+        return $result;
     }
 
     /**
@@ -150,30 +169,28 @@ class TestProcess
      * @param output_path Path to output file created by test
      * @param exp_output_path Path to expected test's output
      */
-    private function compare_diff($output_path, $exp_output_path, $logfile)
+    private function compare_diff($output_path, $exp_output_path, $t_ins)
     {
-        echo_log("Output comparison test: ", $logfile);
-        if (!is_file($exp_output_path))
-        {
-            $this->ti->nof_passed++;
-            echo_log("OK\n", $logfile);
-            echo_log("===============================\n\n", $logfile);
-            return;
-        }
-        exec("diff $output_path $exp_output_path", $diff, $rc);
+        // echo_log("Output comparison test: ", $logfile);
+        // if (!is_file($exp_output_path))
+        // {
+        //     $this->ti->nof_passed++;
+        //     echo_log("OK\n", $logfile);
+        //     echo_log("===============================\n\n", $logfile);
+        //     return;
+        // }
+        $exec_cmd = "diff $output_path $exp_output_path";
+        $t_ins->add_output_log("$exec_cmd\n");
+        exec($exec_cmd, $diff, $rc);
+
         // if output of 'diff' program is empty
         // both output files are identical
-        if ($diff)
-        {
-            echo_log("FAILED (Output files are not identical)\n", $logfile);
-            echo_log($diff, $logfile);
-        }
-        else
-        {
+        if (!$diff)
             $this->ti->nof_passed++;
-            echo_log("OK\n", $logfile);
-        }
-        echo_log("===============================\n\n", $logfile);
+
+        $t_ins->add_output_log($diff);
+        $t_ins->add_output_log("\n");
+        return !$diff;
     }
 
     /**
@@ -218,126 +235,137 @@ class TestProcess
      */
     public function get_results()
     {
-        $nof_passed = $this->ti->nof_passed;
-        $nof_tests = $this->ti->nof_tests;
-        echo "Test results: $nof_passed/$nof_tests\n";
+        echo "Test results: {$this->ti->nof_passed}/{$this->ti->nof_tests}\n";
     }
 
     private function parse_only($test_name, $test_files)
     {
-        // test header
-        echo "Tests in directory: $test_name\n";
-        echo "-------------------------------\n";
-
         foreach ($test_files as $file)
         {
             $this->ti->nof_tests++;
-            $files = $this->generate_test_filepaths($file);
+            $files = $this->generate_test_filepaths($file, $test_name);
+            $t_ins = new TestInstance($files['testname']);
             if (!is_dir($files['test_dir']))
                 mkdir($files['test_dir']);
 
-            // test name
-            echo_log("Test: $files[filename]\n", $files['log']);
-            echo_log("-------------------------------\n", $files['log']);
-            echo_log("Executing test...\n", $files['log']);
-            $exec_cmd = TestInfo::PHP_EXEC . " parse.php < $files[src]" .
-                " > $files[test_dir]/$this->output_file 2>> $files[log]";
+            $exec_cmd = TestInfo::PHP_EXEC." {$this->ti->parse_script} < $files[src]".
+                " > $files[test_dir]/$this->output_file 2> $files[log]";
+            
+            $t_ins->add_rc_log($exec_cmd."\n");
 
-            // return code test
+            // executing test
             exec($exec_cmd, $output, $rc);
             $exp_rc = file_get_contents($files['rc']);
-            if ($this->compare_rc($rc, $exp_rc, $files['log']))
-                continue;
+            $t_ins->add_rc_log(file_get_contents($files['log']));
 
-            // compare xml files
-            $this->compare_xml($files['out'], $files['test_dir'], $files['log']);
+            // compare return codes
+            // if function returns false (meaning test is not done yet)
+            // program compares xml outputs
+            if (!$this->compare_rc($rc, $exp_rc, $t_ins))
+                $t_ins->output_result = $this->compare_xml($files['out'], $files['test_dir'], $t_ins);
 
+            // clean-up created test files
+            // when --noclean flag is used, program leaves files as they are
+            // and stores its path name in $t_ins->output_file
             if (!$this->ti->no_clean)
             {
                 $this->clean_up($files['test_dir']);
                 rmdir($files['test_dir']);
             }
+            else
+            {
+                $t_ins->output_file = realpath("$files[test_dir]/$this->output_file");
+            }
+            // append test instance into list of tests for later HTML display
+            array_push($this->lof_tests, $t_ins);
+            echo "$files[testname] done\n";
         }
     }
 
     private function int_only($test_name, $test_files)
     {
-        // test header
-        echo "Tests in directory: $test_name\n";
-        echo "-------------------------------\n";
-
         foreach ($test_files as $file)
         {
             $this->ti->nof_tests++;
-            $files = $this->generate_test_filepaths($file);
+            $files = $this->generate_test_filepaths($file, $test_name);
+            $t_ins = new TestInstance($files['testname']);
             if (!is_dir($files['test_dir']))
                 mkdir($files['test_dir']);
 
             // test name
-            echo_log("Test: $files[filename]\n", $files['log']);
-            echo_log("-------------------------------\n", $files['log']);
-            echo_log("Executing test...\n", $files['log']);
-            $exec_cmd = TestInfo::PY_EXEC." ".$this->ti->int_script." --source $files[src]".
-                " --input $files[in] > $this->output_dir/$this->output_file 2> $files[log]";
+            $exec_cmd = TestInfo::PY_EXEC." {$this->ti->int_script} --source $files[src]".
+                " --input $files[in] > $files[test_dir]/$this->output_file 2> $files[log]";
+
+            $t_ins->add_rc_log($exec_cmd."\n");
 
             // return code test
             exec($exec_cmd, $output, $rc);
             $exp_rc = file_get_contents($files['rc']);
-            if ($this->compare_rc($rc, $exp_rc, $files['log']))
-                continue;
+            $t_ins->add_rc_log(file_get_contents($files['log']));
+            if (!$this->compare_rc($rc, $exp_rc, $t_ins))
+                $t_ins->output_result = $this->compare_diff("$files[test_dir]/$this->output_file",
+                                                            $files['out'], $t_ins);
 
-            $this->compare_diff("$this->output_dir/$this->output_file",
-                $files['out'], $files['log']);
             if (!$this->ti->no_clean)
             {
                 $this->clean_up($files['test_dir']);
                 rmdir($files['test_dir']);
             }
+            else
+            {
+                $t_ins->output_file = realpath("$files[test_dir]/$this->output_file");
+            }
+            array_push($this->lof_tests, $t_ins);
+            echo "$files[testname] done\n";
         }
     }
 
     private function both($test_name, $test_files)
     {
-        // test header 
-        echo "Tests in directory: $test_name\n";
-        echo "-------------------------------\n";
-
         foreach ($test_files as $file)
         {
             $this->ti->nof_tests++;
-            $files = $this->generate_test_filepaths($file);
+            $files = $this->generate_test_filepaths($file, $test_name);
+            $t_ins = new TestInstance($files['testname']);
             if (!is_dir($files['test_dir']))
                 mkdir($files['test_dir']);
 
             // test name
-            echo_log("Test: $files[filename]\n", $files['log']);
-            echo_log("-------------------------------\n", $files['log']);
-            echo_log("Executing test...\n", $files['log']);
-            $exec_cmd = TestInfo::PHP_EXEC." ".$this->ti->parse_script." < $files[src] | ".
-                TestInfo::PY_EXEC." ".$this->ti->int_script." --input $files[in] > ". 
-                "$this->output_dir/$this->output_file 2>> $files[log]";
+            $exec_cmd = TestInfo::PHP_EXEC." {$this->ti->parse_script} < $files[src] | ".
+                TestInfo::PY_EXEC." {$this->ti->int_script} --input $files[in] > ". 
+                "$files[test_dir]/$this->output_file 2>> $files[log]";
 
+            $t_ins->add_rc_log($exec_cmd."\n");
 
             // return code test
             exec($exec_cmd, $output, $rc);
             $exp_rc = file_get_contents($files['rc']);
-            if ($this->compare_rc($rc, $exp_rc, $files['log'], $files['log']))
-                continue;
-
-            $this->compare_diff("$this->output_dir/$this->output_file",
-                $files['out'], $files['log']);
+            $t_ins->add_rc_log(file_get_contents($files['log']));
+            if (!$this->compare_rc($rc, $exp_rc, $t_ins))
+                $t_ins->output_result = $this->compare_diff("$files[test_dir]/$this->output_file",
+                                                            $files['out'], $t_ins);
             if (!$this->ti->no_clean)
             {
                 $this->clean_up($files['test_dir']);
                 rmdir($files['test_dir']);
             }
+            else
+            {
+                $t_ins->output_file = realpath("$files[test_dir]/$this->output_file");
+            }
+            array_push($this->lof_tests, $t_ins);
+            echo "$files[testname] done\n";
         }
     }
 
-    private function generate_html()
+    public function generate_html()
     {
-        // TODO:
+        $hg = HtmlGenerator::get_instance();
+        $hg->generate_results($this->ti->nof_passed, $this->ti->nof_tests);
+        foreach ($this->lof_tests as $test_instance)
+            $hg->add_test_instance($test_instance);
+        $hg->generate_files('index.html');
     }
+
 }
 /* testinfo.php */
-?>

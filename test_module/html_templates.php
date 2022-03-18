@@ -27,6 +27,7 @@ class HtmlTemplates
         <div class="testContent">
             <div class="leftPanel">
                 <p></p>
+                <p class="log"></p>
             </div>
             <div class="symbol">
                 <p class="goodResult">&#x2713;</p>
@@ -42,6 +43,7 @@ class HtmlTemplates
         <div class="testContent">
             <div class="leftPanel">
                 <p></p>
+                <p class="log"></p>
             </div>
             <div class="symbol">
                 <p class="badResult">&#x2715;</p>
