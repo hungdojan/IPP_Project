@@ -1,4 +1,12 @@
 <?php
+/**
+ * HTML generating class
+ *
+ * This source code serves as submission for
+ * second part of the project of class IPP at FIT, BUT 2021/2022
+ *
+ * @author  Hung Do
+ */
 
 require_once "testinstance.php";
 require_once "html_templates.php";
@@ -6,10 +14,9 @@ require_once "html_templates.php";
 class HtmlGenerator
 {
     private static $instance = null;
-    private $doc;
-    private $body;
+    private $doc;   /**< DOMDocument */
+    private $body;  /**< HTML <body> element */
 
-    // singleton
     private function __construct()
     {
         // document setup
@@ -19,22 +26,19 @@ class HtmlGenerator
 
     /**
      * Final HTML file setup
-     * Stores important elements (html, head and body) into $this->elems array
-     * for later easy access.
+     * Stores important body elements for later easy access.
      */
     private function setup()
     {
         $this->doc->formatOutput = true;
-        $ignore_error = libxml_use_internal_errors(true);
         $this->doc->loadHTML(HtmlTemplates::$body);
         $this->body = $this->doc->getElementsByTagName('body')->item(0);
-        libxml_use_internal_errors($ignore_error);
     }
 
     /**
      * Get instance of HtmlGenerator
      * 
-     * @return One instance of HtmlGenerator
+     * @return HtmlGenerator One instance of HtmlGenerator
      */
     public static function get_instance()
     {
@@ -44,10 +48,13 @@ class HtmlGenerator
     }
 
     /**
-     * Get test content text
+     * Get result's paragraph content
+     * 
+     * @return string Result paragraph's inner text
      */
     private function get_result_paragraph(TestInstance $test_instance)
     {
+        // get test outcomes 
         $return_code_text = $test_instance->get_return_code() ?
                             "OK" : "FAILED";
         if (is_null($test_instance->output_result))
@@ -59,16 +66,26 @@ class HtmlGenerator
 
         $output_msg = "Return code: <b>{$return_code_text}</b><br/>\n";
         $output_msg .= "Output comparison: <b>{$output_cmp_text}</b><br/>\n";
+
+        // add link to output file when exists
         if (!is_null($test_instance->output_file))
             $output_msg .= "Output file: <a href=\"{$test_instance->output_file}\">See output file</a><br/>\n";
         return $output_msg;
     }
 
-    private function get_log_paragraph(TestInstance $test_instance)
+    /**
+     * Load log content from test session
+     * 
+     * @param test_instance Instance of test session
+     * @return string Log paragraph's inner text
+     */
+    private function get_log_paragraph($test_instance)
     {
         $rc_msg = $test_instance->get_rc_log();
         $output_msg = $test_instance->get_output_log();
         $output = $rc_msg;
+
+        // return code and output comparison splitter
         $output .= "===============================<br/><br/>";
 
         if (!is_null($test_instance->output_result))
@@ -77,9 +94,11 @@ class HtmlGenerator
     }
 
     /**
-     * Append new test instance window
+     * Append new test session block to <body>
+     * 
+     * @param test_instance Instance of test session
      */
-    public function add_test_instance(TestInstance $test_instance)
+    public function add_test_instance($test_instance)
     {
         // choose test output depending on test result
         $doc = new DOMDocument();
@@ -110,7 +129,10 @@ class HtmlGenerator
     }
 
     /**
-     * Append result window
+     * Append final result block to <body>
+     * 
+     * @param nof_passed    Number of passed tests
+     * @param nof_tests     Number of tests
      */
     public function generate_results($nof_passed, $nof_tests)
     {
@@ -152,6 +174,10 @@ class HtmlGenerator
 
     /**
      * Print out file(s)
+     * When output file is defined HTML content is parse into it.
+     * Otherwise HTML content is printed to console.
+     * 
+     * @param file Output filename (default: null)
      */
     public function generate_files($file=null)
     {
@@ -163,4 +189,5 @@ class HtmlGenerator
     }
 }
 
+/* html_generator.php */
 ?>

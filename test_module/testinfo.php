@@ -8,14 +8,6 @@
  * @author  Hung Do
  */
 
-enum TestType
-{
-    case PARSE_ONLY;
-    case INT_ONLY;
-    case BOTH;
-}
-
-
 /**
  * Write to stdout and append to msg to log file
  *
@@ -153,7 +145,12 @@ class TestInfo
     }
 
     /**
-     * TODO:
+     * Validate int-only tests
+     * No parse related flags must be used in arguments together with int-only flag.
+     * Otherwise program is terminated with error code 41.
+     * 
+     * Function also sets default values of $int_script if not specified by user.
+     * When interpreter script not found, program is terminated with error code 41.
      */
     private function check_int_only()
     {
@@ -171,6 +168,7 @@ class TestInfo
         // and check file's existence
         if (is_null($this->int_script))
             $this->int_script = getcwd()."/interpret.py";
+
         if (!is_file($this->int_script))
         {
             error_log("Interpret script not found!\nFor help use --help option",
@@ -180,7 +178,10 @@ class TestInfo
     }
 
     /**
-     * TODO:
+     * Validate program arguments when neither --int-only nor --parse-only flags were defined.
+     * 
+     * Program is terminated with error code 41
+     * if at least one of the scripts is invalid.
      */
     private function check_both()
     {

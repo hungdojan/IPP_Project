@@ -11,14 +11,29 @@
 require_once "test_module/testinfo.php";
 require_once "test_module/testprocess.php";
 
+// test initialization
 $test_dst = "test_build";
 $tp = new TestProcess($test_dst);
-$tp->run_test($tp->ti->directory, TestType::BOTH);
+
+// test execution
+$tp->run_test($tp->ti->directory);
 $tp->get_results();
+
+echo "Deleting content of directory $test_dst. Are you sure (y/N)?\n";
+$handle = fopen("php://stdin", 'r');
+$line = fgets($handle);
+if (strtolower(trim($line)) != 'y')
+{
+    fclose($handle);
+    exit(0);
+}
+
+// clean up created test directory
 if (!$tp->ti->no_clean)
 {
     clean_directory($test_dst);
     rmdir($test_dst);
 }
+fclose($handle);
 /* test.php */
 ?>
