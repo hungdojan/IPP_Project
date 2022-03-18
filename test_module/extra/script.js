@@ -1,4 +1,6 @@
-Array.from(document.getElementsByClassName('testPassed')).forEach(elem => {
+// expand success test unit
+var testPassedDivs = document.getElementsByClassName('testPassed')
+Array.from(testPassedDivs).forEach(elem => {
     elem.onclick = function () {
         if (elem.children[1].style.display === '' || elem.children[1].style.display === 'none') {
             elem.children[1].style.display = 'flex';
@@ -8,7 +10,9 @@ Array.from(document.getElementsByClassName('testPassed')).forEach(elem => {
     }
 });
 
-Array.from(document.getElementsByClassName('testFailed')).forEach(elem => {
+// expand failed test unit
+var testFailedDivs = document.getElementsByClassName('testFailed');
+Array.from(testFailedDivs).forEach(elem => {
     elem.onclick = function () {
         if (elem.children[1].style.display === '' || elem.children[1].style.display === 'none') {
             elem.children[1].style.display = 'flex';
@@ -17,3 +21,19 @@ Array.from(document.getElementsByClassName('testFailed')).forEach(elem => {
         }
     }
 });
+
+// show all or show failed tests
+var elem = document.getElementById('testResult');
+var showAll = true; 
+elem.onclick = function() {
+    if (showAll) {
+        Array.from(testPassedDivs).forEach(elem => {
+            elem.style.display = 'none';
+        });
+    } else {
+        Array.from(testPassedDivs).forEach(elem => {
+            elem.style.display = "";
+        });
+    }
+    showAll = !showAll;
+};

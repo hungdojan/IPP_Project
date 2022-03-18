@@ -26,24 +26,15 @@ enum TestType
 function echo_log($msg, $logfilepath, $write_stderr=false)
 {
     if (is_array($msg))
-    {
-        foreach ($msg as $line)
-        {
-            if ($write_stderr)
-                error_log($line);
-            else
-                echo $line . "\n";
-            file_put_contents($logfilepath, $line, FILE_APPEND);
-        }
-    }
+        $output_msg = implode("\n", $msg);
     else
-    {
-        if ($write_stderr)
-            error_log($msg);
-        else
-            echo $msg;
-        file_put_contents($logfilepath, $msg, FILE_APPEND);
-    }
+        $output_msg = $msg;
+
+    if ($write_stderr)
+        error_log($output_msg);
+    else
+        echo $output_msg;
+    file_put_contents($logfilepath, $output_msg, FILE_APPEND);
 }
 
 /**
@@ -309,7 +300,7 @@ class TestInfo
                                      and options files (default: /pub/courses/ipp/jexamxml/)
             --noclean                doesn't empty test files
 
-EOT;
+        EOT;
         echo $usage_msg;
         exit(0);
     }
