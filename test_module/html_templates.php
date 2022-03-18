@@ -1,4 +1,12 @@
 <?php
+/**
+ * Static class with HTML templates for generating test results
+ *
+ * This source code serves as submission for
+ * second part of the project of class IPP at FIT, BUT 2021/2022
+ *
+ * @author  Hung Do
+ */
 
 class HtmlTemplates
 {
@@ -65,11 +73,6 @@ class HtmlTemplates
         </div>
     </div>
     EOT;
-
-    public static $style_css = <<<EOT
-    EOT;
-
-    public static $script_js = <<<EOT
-    EOT;
 }
+/* html_templates.php */
 ?>

@@ -14,21 +14,19 @@ require_once "html_generator.php";
 
 class TestProcess
 {
-    public $output_dir;
-    public $output_file;
-    public $ti;
-    public $lof_tests;
+    public $output_dir; /**< Root dirname where test output files and logs will be created */
+    public $output_file = 'test_out';
+    public $ti;         /**< TestInfo instance */
+    public $lof_tests;  /**< Array of test instances */
 
     /**
      * Class constructor
      *
      * @param output_dir    Path to directory to create test outputs
-     * @param output_file   Name of final output file
      */
-    public function __construct($output_dir='test_build', $output_file='test_out')
+    public function __construct($output_dir)
     {
         $this->output_dir = $output_dir;
-        $this->output_file = $output_file;
         $this->ti = new TestInfo($output_dir);
         $this->lof_tests = [];
     }
@@ -49,7 +47,7 @@ class TestProcess
      * function creates then with default values (empty .in; 0 in .rc)
      *
      * @param filename Path to '.src' path name
-     * @return Array of useful file paths
+     * @return array Array of useful file paths
      */
     private function generate_test_filepaths($filename, $parent_dir)
     {
@@ -103,33 +101,19 @@ class TestProcess
      *
      * @param rc      Return code of executed test
      * @param exp_rc  Expected return code
-     * @return 'true' when test session ends 
+     * @return bool 'true' when test session ends 
      */
     private function compare_rc($rc, $exp_rc, $t_ins)
     {
-        // echo_log("Return code test: ", $logfile);
-        // if ($rc != $exp_rc)
-        // {
-        //     echo_log("FAILED\nExpected $exp_rc, received $rc\n", $logfile);
-        //     echo_log("===============================\n\n", $logfile);
-        //     return true;
-        // }
-        // echo_log("OK\n", $logfile);
-        // if ($rc != 0)
-        // {
-        //     $this->ti->nof_passed++;
-        //     echo_log("===============================\n\n", $logfile);
-        //     return true;
-        // }
-        // return false;
         $t_ins->ret_code = $rc;
         $t_ins->exp_ret_code = $exp_rc;
         if ($rc != $exp_rc)
         {
+            // logging error line
             $t_ins->add_rc_log("Expected $exp_rc, received $rc\n");
             return true;
         }
-        if ($rc != 0)
+        if ($rc != 0)   // ending test session
         {
             $this->ti->nof_passed++;
             return true;
@@ -143,20 +127,25 @@ class TestProcess
      * Uses JExamXML framework to run test
      * When test passes nof_passed is increased
      *
-     * @param exp_output_path Path to expected test's output
+     * @param exp_output_path   Path to expected test's output
+     * @param output_path       Output dirname
+     * @param t_ins             Instance of TestInstance class
      */
-    private function compare_xml($exp_output_path, $output_path, TestInstance $t_ins)
+    private function compare_xml($exp_output_path, $output_path, $t_ins)
     {
         $exec_cmd = "java -jar {$this->ti->jexampath}jexamxml.jar $output_path/$this->output_file " .
             "$exp_output_path $output_path/diff.err {$this->ti->jexampath}options 2>/dev/null";
 
+        // logging executed command
         $t_ins->add_output_log("$exec_cmd\n");
 
+        // execute program and get test results from JExamXML's output
         exec($exec_cmd, $output, $rc);
         $result = count($output) > 2 && $output[2] == "Two files are identical";
         if ($result)
             $this->ti->nof_passed++;
 
+        // logging program's output
         $t_ins->add_output_log($output);
         $t_ins->add_output_log("\n");
         return $result;
@@ -166,20 +155,15 @@ class TestProcess
      * Compare output files with 'diff' command
      * When test passes nof_passed counter is increased
      *
-     * @param output_path Path to output file created by test
-     * @param exp_output_path Path to expected test's output
+     * @param output_path       Path to output file created by test
+     * @param exp_output_path   Path to expected test's output
+     * @param t_ins             Instance of TestInstance class
      */
     private function compare_diff($output_path, $exp_output_path, $t_ins)
     {
-        // echo_log("Output comparison test: ", $logfile);
-        // if (!is_file($exp_output_path))
-        // {
-        //     $this->ti->nof_passed++;
-        //     echo_log("OK\n", $logfile);
-        //     echo_log("===============================\n\n", $logfile);
-        //     return;
-        // }
         $exec_cmd = "diff $output_path $exp_output_path";
+
+        // logging executed command
         $t_ins->add_output_log("$exec_cmd\n");
         exec($exec_cmd, $diff, $rc);
 
@@ -188,6 +172,7 @@ class TestProcess
         if (!$diff)
             $this->ti->nof_passed++;
 
+        // logging diff's output
         $t_ins->add_output_log($diff);
         $t_ins->add_output_log("\n");
         return !$diff;
@@ -198,7 +183,6 @@ class TestProcess
      * When $ti->recursive flag is toggled, tests are also run in subdirectories
      *
      * @param src_dir Source directory
-     * @param test_type Type of test (enum TestType)
      */
     public function run_test($src_dir)
     {
@@ -206,7 +190,7 @@ class TestProcess
         if (!preg_match('/\/$/', $src_dir))
             $src_dir .= '/';
 
-        // scan current directory
+        // scan current directory for subdirectories and source files
         $dirs = glob("$src_dir*", GLOB_ONLYDIR);
         $test_files = glob("$src_dir*.src");
 
@@ -221,7 +205,7 @@ class TestProcess
         if (count($test_files) < 1)
             return;
         
-
+        // run test in current directory
         if ($this->ti->parse_only)
             $this->parse_only($src_dir, $test_files);
         elseif ($this->ti->int_only)
@@ -231,13 +215,22 @@ class TestProcess
     }
 
     /**
-     * Print results
+     * Print results to console
      */
     public function get_results()
     {
         echo "Test results: {$this->ti->nof_passed}/{$this->ti->nof_tests}\n";
     }
 
+    /**
+     * Run parse test
+     * Cycle through all the test files in $test_name directory. Runs program and
+     * compares return codes and output of the test with expected values/files.
+     * When test passes $this->ti->nof_passed counter is incremented.
+     * 
+     * @param test_name     Source dirname with test files in it
+     * @param test_files    Array of .src files 
+     */
     private function parse_only($test_name, $test_files)
     {
         foreach ($test_files as $file)
@@ -279,9 +272,18 @@ class TestProcess
             // append test instance into list of tests for later HTML display
             array_push($this->lof_tests, $t_ins);
             echo "$files[testname] done\n";
-        }
+        } // foreach ($test_files as $file)
     }
 
+    /**
+     * Run interpreter test
+     * Cycle through all the test files in $test_name directory. Runs program and
+     * compares return codes and output of the test with expected values/files.
+     * When test passes $this->ti->nof_passed counter is incremented.
+     * 
+     * @param test_name     Source dirname with test files in it
+     * @param test_files    Array of .src files 
+     */
     private function int_only($test_name, $test_files)
     {
         foreach ($test_files as $file)
@@ -317,9 +319,19 @@ class TestProcess
             }
             array_push($this->lof_tests, $t_ins);
             echo "$files[testname] done\n";
-        }
+        } // foreach ($test_files as $file)
     }
 
+    /**
+     * Run both test
+     * Creates a pipeline between parse and interpreter scirpts. 
+     * Cycle through test files in $test_name directory. Runs program and 
+     * compares return codes and output of the test with expected values/files.
+     * When test passes $this->ti->nof_passed counter is incremented.
+     * 
+     * @param test_name     Source dirname with test files in it
+     * @param test_files    Array of .src files 
+     */
     private function both($test_name, $test_files)
     {
         foreach ($test_files as $file)
@@ -355,9 +367,12 @@ class TestProcess
             }
             array_push($this->lof_tests, $t_ins);
             echo "$files[testname] done\n";
-        }
+        } // foreach ($test_files as $file)
     }
 
+    /**
+     * Generate HTML file with test results
+     */
     public function generate_html()
     {
         $hg = HtmlGenerator::get_instance();
