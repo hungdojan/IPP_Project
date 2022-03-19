@@ -18,6 +18,7 @@ $tp = new TestProcess($test_dst);
 // test execution
 $tp->run_test($tp->ti->directory);
 $tp->get_results();
+$tp->generate_html();
 
 // clean up created test directory
 if (!$tp->ti->no_clean)

@@ -582,7 +582,9 @@ def read(prg_cntr: int, args: list):
     op1 = CoreData.get_symbol(args[1])
     input_value = CoreData.get_line()
 
-    if op1.value == 'string':
+    if input_value is None:
+        var.value = None
+    elif op1.value == 'string':
         var.value = input_value
     elif op1.value == 'bool':
         var.value = (input_value.lower() == 'true')
