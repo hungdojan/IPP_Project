@@ -40,7 +40,6 @@ class HtmlTemplates
             <div class="symbol">
                 <p class="goodResult">&#x2713;</p>
             </div>
-
         </div>
     </div>
     EOT;
@@ -71,6 +70,8 @@ class HtmlTemplates
                 <p id="percentageText"></p>
             </div>
         </div>
+        <p id="help">Click on this <b>Test Results</b> window to toggle failed tests filter<br/>
+           To get more informations about test unit click on the corresponding test section</p>
     </div>
     EOT;
 }

@@ -85,6 +85,10 @@ h2 {
     align-items: center;
 }
 
+#help {
+    text-align: center;
+}
+
 #percentage {
     font-size: 80px;
     text-align: center;

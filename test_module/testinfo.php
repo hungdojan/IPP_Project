@@ -30,16 +30,24 @@ function echo_log($msg, $logfilepath, $write_stderr=false)
 }
 
 /**
- * Remove test directory and its content with max depth of 1
+ * Recursively remove directory content
  *
  * @param src_dir   Source directory
  */
-function remove_test_directory($src_dir)
+function clean_directory($src_dir)
 {
-    // remove files
-    if (!is_dir($src_dir))
+    if ($src_dir == '' || $src_dir == null || !is_dir($src_dir))
         return;
-    $files = array_filter(glob("$src_dir/*"), 'is_file');
+    //
+    // recursively remove directory contents and directory
+    $dirs = glob("$src_dir/*", GLOB_ONLYDIR);
+    foreach ($dirs as $dir)
+    {
+        clean_directory($dir);
+        rmdir($dir);
+    }
+    // remove files
+    $files = glob("$src_dir/*");
     foreach ($files as $file)
         unlink($file);
 }
