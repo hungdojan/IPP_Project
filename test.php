@@ -23,7 +23,7 @@ $tp->generate_html();
 // clean up created test directory
 if (!$tp->ti->no_clean)
 {
-    clean_directory($test_dst);
+    remove_test_directory($test_dst);
     rmdir($test_dst);
 }
 /* test.php */

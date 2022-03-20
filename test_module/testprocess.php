@@ -271,7 +271,8 @@ class TestProcess
             }
             // append test instance into list of tests for later HTML display
             array_push($this->lof_tests, $t_ins);
-            echo "$files[testname] done\n";
+            $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
+            echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 
@@ -318,7 +319,8 @@ class TestProcess
                 $t_ins->output_file = realpath("$files[test_dir]/$this->output_file");
             }
             array_push($this->lof_tests, $t_ins);
-            echo "$files[testname] done\n";
+            $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
+            echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 
@@ -366,7 +368,8 @@ class TestProcess
                 $t_ins->output_file = realpath("$files[test_dir]/$this->output_file");
             }
             array_push($this->lof_tests, $t_ins);
-            echo "$files[testname] done\n";
+            $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
+            echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 

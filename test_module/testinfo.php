@@ -30,31 +30,22 @@ function echo_log($msg, $logfilepath, $write_stderr=false)
 }
 
 /**
- * Recursively remove directory content
+ * Remove test directory and its content with max depth of 1
  *
  * @param src_dir   Source directory
  */
-function clean_directory($src_dir)
+function remove_test_directory($src_dir)
 {
-    if ($src_dir == '' || $src_dir == null)
-        return;
-    // recursively remove directory contents and directory
-    $dirs = glob("$src_dir/*", GLOB_ONLYDIR);
-    foreach ($dirs as $dir)
-    {
-        clean_directory($dir);
-        rmdir($dir);
-    }
     // remove files
-    $files = glob("$src_dir/*");
+    if (!is_dir($src_dir))
+        return;
+    $files = array_filter(glob("$src_dir/*"), 'is_file');
     foreach ($files as $file)
         unlink($file);
 }
 
 class TestInfo
 {
-    // public const PHP_EXEC = 'php8.1';
-    // public const PY_EXEC  = 'python3;
     public const PHP_EXEC = 'php';
     public const PY_EXEC  = 'python';
     private $logfile;
