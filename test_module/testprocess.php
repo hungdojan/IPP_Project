@@ -130,6 +130,7 @@ class TestProcess
      * @param exp_output_path   Path to expected test's output
      * @param output_path       Output dirname
      * @param t_ins             Instance of TestInstance class
+     * @return bool 'true' when test passed
      */
     private function compare_xml($exp_output_path, $output_path, $t_ins)
     {
@@ -158,6 +159,7 @@ class TestProcess
      * @param output_path       Path to output file created by test
      * @param exp_output_path   Path to expected test's output
      * @param t_ins             Instance of TestInstance class
+     * @return bool 'true' when test passed
      */
     private function compare_diff($output_path, $exp_output_path, $t_ins)
     {

@@ -5,8 +5,6 @@ File:   statement.py
 Module: proj2_module
 """
 import re
-import sys
-from .error import ErrorCode
 
 class Argument:
 
@@ -16,13 +14,16 @@ class Argument:
         if arg is not None:
             self._symbol_init(arg)
 
+
     @property
     def type(self):
         return self._type
 
+
     @property
     def value(self):
         return self._value
+
 
     def _symbol_init(self, arg: tuple):
         """Initialized argument from tuple (type, value)
@@ -45,11 +46,12 @@ class Argument:
         else:   # nil type
             self._value = None
 
+
     def _format_string(self, str_val: str):
         """Format string into printable value"""
 
         def ascii_to_str(match_obj):
-            f"""Convert \XXX format into ascii_char_value"""
+            """Convert \XXX format into ascii_char_value"""
             ascii_value = int(match_obj.group(0)[1:])
             return chr(ascii_value)
 
@@ -58,11 +60,14 @@ class Argument:
         else:
             self._value = re.sub(r'\\\d{3}', ascii_to_str, str_val)
 
+
     def __str__(self):
         return f"[{self._type}: {self._value}]"
 
+
     def __repr__(self):
         return str(self)
+
 
 class Statement:
 
@@ -77,6 +82,7 @@ class Statement:
         for arg in self.args:
             output_msg += f" {arg}"
         return output_msg
+
 
     def __repr__(self):
         return str(self)

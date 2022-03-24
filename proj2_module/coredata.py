@@ -13,6 +13,8 @@ class CoreData:
     input_file: list = None
     _line_index = 0
     source_file = None
+    ins_performed = 0
+
     REG_TYPE = {
             'var': r'(GF|LF|TF)@[a-zA-Z_$&%*!?-][a-zA-Z0-9_$&%*!?-]*',
             'string': r'([^\s#\\]|\\\d{3})*',
@@ -26,13 +28,14 @@ class CoreData:
     global_frame: Frame = Frame()
     temp_frame: Frame   = None
     local_frame: Frame  = None
+
     labels = {}
     undef_labels = set()
-    ins_performed = 0
 
     stack_func = []
     stack_frames = []
     stack_vals = []
+
 
     @classmethod
     def add_variable(cls, var_name: str):
@@ -113,7 +116,7 @@ class CoreData:
                 f"Error: Variable {var_name} has not been defined",
                 ErrorCode.RUNTIME_UNDEF_VAR)
         return var
-            
+
 
     @classmethod
     def get_symbol(cls, argument: Argument) -> Argument:
@@ -129,6 +132,7 @@ class CoreData:
             var: Variable = cls.get_variable(argument.value)
             return var
         return argument
+
 
     @classmethod
     def get_line(cls) -> str:
@@ -171,6 +175,7 @@ class CoreData:
                 # jump one forward (instruction after label)
                 cls.labels[stat.args[0].value] = i+1
 
+
     @classmethod
     def update_label_data(cls, stat: Statement):
         """Update label-instruction related data
@@ -194,6 +199,7 @@ class CoreData:
             if cls.labels.get(stat.args[0].value) is None:
                 cls.undef_labels.add(stat.args[0].value)
 
+
     @classmethod
     def stack_push(cls, value):
         """Push value to the data stack
@@ -203,6 +209,7 @@ class CoreData:
 
         """
         cls.stack_vals.append(value)
+
 
     @classmethod
     def stack_pop(cls):

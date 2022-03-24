@@ -18,6 +18,7 @@ from .coredata import CoreData
 from .frame import Frame, Variable
 from .stack_instruction_set import *
 
+
 def move(prg_cntr: int, args: list):
     """ Move value <symb> to <var>
         MOVE <var> <symb>
@@ -67,6 +68,7 @@ def pushframe(prg_cntr: int, args: list):
     CoreData.local_frame = CoreData.temp_frame
     return prg_cntr + 1
 
+
 def popframe(prg_cntr: int, args: list):
     """ Pop frame from stack of frames to temporary frame """
     if len(args) != 0:
@@ -89,6 +91,7 @@ def popframe(prg_cntr: int, args: list):
         CoreData.local_frame = CoreData.stack_frames[-1]
     return prg_cntr + 1
 
+
 def defvar(prg_cntr: int, args: list):
     """ Define new <var>
         DEFVAR <var>
@@ -101,6 +104,7 @@ def defvar(prg_cntr: int, args: list):
     var_name = args[0].value
     CoreData.add_variable(var_name)
     return prg_cntr + 1
+
 
 def call(prg_cntr: int, args: list):
     """ Jump to <label> while perserving instruction pointer value
@@ -118,6 +122,7 @@ def call(prg_cntr: int, args: list):
     CoreData.stack_func.append(prg_cntr)
     return CoreData.labels[lbl_name] - 1
 
+
 def return_i(prg_cntr: int, args: list):
     """ Jump back to stored instruction pointer value """
     if len(args) != 0:
@@ -132,6 +137,7 @@ def return_i(prg_cntr: int, args: list):
 
     prg_cntr = CoreData.stack_func.pop()
     return prg_cntr + 1
+
 
 def add(prg_cntr: int, args: list):
     """ Add two numbers and store in <var>
@@ -162,6 +168,7 @@ def add(prg_cntr: int, args: list):
 
     return prg_cntr + 1
 
+
 def sub(prg_cntr: int, args: list):
     """ Subtract two numbers and store in <var>
         SUB <var> <symb> <symb>
@@ -190,6 +197,7 @@ def sub(prg_cntr: int, args: list):
     var.value = op1.value - op2.value
     return prg_cntr + 1
 
+
 def mul(prg_cntr: int, args: list):
     """ Multiply two numbers and store in <var>
         MUL <var> <symb> <symb>
@@ -217,6 +225,7 @@ def mul(prg_cntr: int, args: list):
 
     var.value = op1.value * op2.value
     return prg_cntr + 1
+
 
 def div(prg_cntr: int, args: list):
     """ Divide two numbers and store in <var>
@@ -251,6 +260,7 @@ def div(prg_cntr: int, args: list):
     var.value = op1.value / op2.value
     return prg_cntr + 1
 
+
 def idiv(prg_cntr: int, args: list):
     """ Divide two numbers and store in <var> round down value
         IDIV <var> <symb> <symb>
@@ -284,6 +294,7 @@ def idiv(prg_cntr: int, args: list):
     var.value = op1.value // op2.value
     return prg_cntr + 1
 
+
 def lt(prg_cntr: int, args: list):
     """ Check if <symb1> is less than <symb2>; store in <var>
         LT <var> <symb1> <symb2>
@@ -315,6 +326,7 @@ def lt(prg_cntr: int, args: list):
     var.value = op1.value < op2.value
     return prg_cntr + 1
 
+
 def gt(prg_cntr: int, args: list):
     """ Check if <symb1> is greater than <symb2>; store in <var>
         GT <var> <symb1> <symb2>
@@ -342,6 +354,7 @@ def gt(prg_cntr: int, args: list):
     var.value = op1.value > op2.value
     return prg_cntr + 1
 
+
 def eq(prg_cntr: int, args: list):
     """ Check if <symb1> and <symb2> values are equal; store in <var>
         EQ <var> <symb1> <symb2>
@@ -368,6 +381,7 @@ def eq(prg_cntr: int, args: list):
 
     var.value = op1.value == op2.value
     return prg_cntr + 1
+
 
 def and_i(prg_cntr: int, args: list):
     """ Store 'true' in <var> if both <symb1> and <symb2> are 'true'
@@ -397,6 +411,7 @@ def and_i(prg_cntr: int, args: list):
     var.value = op1.value and op2.value
     return prg_cntr + 1
 
+
 def or_i(prg_cntr: int, args: list):
     """ Store 'false' in <var> if both <symb1> and <symb2> are 'false'
             otherwise store 'true'
@@ -425,6 +440,7 @@ def or_i(prg_cntr: int, args: list):
     var.value = op1.value or op2.value
     return prg_cntr + 1
 
+
 def not_i(prg_cntr: int, args: list):
     """ Negate <symb> value and store in <var>
         NOT <var> <symb>
@@ -450,6 +466,7 @@ def not_i(prg_cntr: int, args: list):
 
     var.value = not op1.value
     return prg_cntr + 1
+
 
 def int2char(prg_cntr: int, args: list):
     """ Convert number <symb> to ascii value character
@@ -481,6 +498,7 @@ def int2char(prg_cntr: int, args: list):
 
     var.value = chr(op1.value)
     return prg_cntr + 1
+
 
 def stri2int(prg_cntr: int, args: list):
     """ Store ascii value of character at position <symb2> in string <symb1>
@@ -515,6 +533,7 @@ def stri2int(prg_cntr: int, args: list):
     var.value = ord(op1.value[op2.value])
     return prg_cntr + 1
 
+
 def int2float(prg_cntr: int, args: list):
     """ Converts int value <symb> to float and store in <var>
         INT2FLOAT <var> <symb>
@@ -541,6 +560,7 @@ def int2float(prg_cntr: int, args: list):
     var.value = float(op1.value)
     return prg_cntr + 1
 
+
 def float2int(prg_cntr: int, args: list):
     """ Converts float value <symb> to int and store in <var>
         FLOAT2INT <var> <symb>
@@ -566,6 +586,7 @@ def float2int(prg_cntr: int, args: list):
 
     var.value = int(op1.value)
     return prg_cntr + 1
+
 
 def read(prg_cntr: int, args: list):
     """ Read from input file <type> and store in <var>
@@ -608,6 +629,7 @@ def read(prg_cntr: int, args: list):
 
     return prg_cntr + 1
 
+
 def write(prg_cntr: int, args: list):
     """ Write to STDIN <symb> value
         WRITE <symb>
@@ -634,6 +656,7 @@ def write(prg_cntr: int, args: list):
     else:
         print(symb.value, end='', flush=True)
     return prg_cntr + 1
+
 
 def concat(prg_cntr: int, args: list):
     """ Concatenate <symb2> to <symb1>; store in <var>
@@ -662,6 +685,7 @@ def concat(prg_cntr: int, args: list):
     var.value = op1.value + op2.value
     return prg_cntr + 1
 
+
 def strlen(prg_cntr: int, args: list):
     """ Store string length of <symb> in <var>
         STRLEN <var> <symb>
@@ -687,6 +711,7 @@ def strlen(prg_cntr: int, args: list):
 
     var.value = len(op1.value)
     return prg_cntr + 1
+
 
 def getchar(prg_cntr: int, args: list):
     """ Get character of <symb1> at position <symb2>; store in <var>
@@ -719,6 +744,7 @@ def getchar(prg_cntr: int, args: list):
 
     var.value = op1.value[op2.value]
     return prg_cntr + 1
+
 
 def setchar(prg_cntr: int, args: list):
     """ Set character of <symb1> at position <symb2>; store in <var>
@@ -757,6 +783,7 @@ def setchar(prg_cntr: int, args: list):
     # --------------------
     return prg_cntr + 1
 
+
 def type_i(prg_cntr: int, args: list):
     """ Store type of <symb> in string form in <var>
         TYPE <var> <symb>
@@ -776,6 +803,7 @@ def type_i(prg_cntr: int, args: list):
         var.value = op1.type
     return prg_cntr + 1
 
+
 def label(prg_cntr: int, args: list):
     """ Label to jump
         LABEL <label>
@@ -786,6 +814,7 @@ def label(prg_cntr: int, args: list):
                 ErrorCode.XML_STRUCTURE_ERROR)
 
     return prg_cntr + 1
+
 
 def jump(prg_cntr: int, args: list):
     """ Jump to <label>
@@ -799,6 +828,7 @@ def jump(prg_cntr: int, args: list):
     lbl_name = args[0].value
 
     return CoreData.labels[lbl_name]
+
 
 def jumpifeq(prg_cntr: int, args: list):
     """ Jump to <label> if <symb1> is equal to <symb2>
@@ -827,6 +857,7 @@ def jumpifeq(prg_cntr: int, args: list):
 
     return CoreData.labels[lbl_name] if op1.value == op2.value else prg_cntr+1
 
+
 def jumpifneq(prg_cntr: int, args: list):
     """ Jump to <label> if <symb1> is not equal to <symb2>
         JUMPIFNEQ <label> <symb1> <sym2>
@@ -853,6 +884,7 @@ def jumpifneq(prg_cntr: int, args: list):
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value != op2.value else prg_cntr+1
+
 
 def exit_i(prg_cntr: int, args: list):
     """ Exit program with <symb> value
@@ -885,6 +917,7 @@ def exit_i(prg_cntr: int, args: list):
     # dead code
     sys.exit(symb.value)
 
+
 def dprint(prg_cntr: int, args: list):
     """ Write <symb> value to STDERR
         DPRINT <symb>
@@ -911,6 +944,7 @@ def dprint(prg_cntr: int, args: list):
         sys.stderr.write(symb.value)
     return prg_cntr + 1
 
+
 def break_i(prg_cntr: int, args: list):
     """ Write program debug information to STDERR
         BREAK
@@ -934,6 +968,7 @@ def break_i(prg_cntr: int, args: list):
 
     sys.stderr.write("\nObsah docasneho ramce: \n")
     if CoreData.temp_frame is None or not CoreData.temp_frame.is_active:
+
         sys.stderr.write("\tDocasny ramec je zatim nedefinovany\n\n")
     else:
         for item in CoreData.temp_frame.vars.items():
@@ -943,6 +978,7 @@ def break_i(prg_cntr: int, args: list):
     sys.stderr.write("================================\n")
 
     return prg_cntr + 1
+
 
 instruct_set = {
         'MOVE': move,

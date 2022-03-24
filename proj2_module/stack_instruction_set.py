@@ -18,6 +18,7 @@ from .frame import Variable
 
 UNICODE_MAX_VAL: int = 1_114_111
 
+
 def pushs(prg_cntr: int, args: list):
     """ Push value of <symb> to stack
         PUSHS <symb>
@@ -40,6 +41,7 @@ def pushs(prg_cntr: int, args: list):
     CoreData.stack_push(value)
     return prg_cntr + 1
 
+
 def pops(prg_cntr: int, args: list):
     """ Pop data from stack to <var>
         POPS <var>
@@ -55,6 +57,7 @@ def pops(prg_cntr: int, args: list):
     var.value = stack_value.value
     return prg_cntr + 1
 
+
 def clears(prg_cntr: int, args: list):
     if len(args) != 0:
         ErrorCode.exit_error(
@@ -62,6 +65,7 @@ def clears(prg_cntr: int, args: list):
                 ErrorCode.XML_STRUCTURE_ERROR)
     CoreData.stack_vals.clear()
     return prg_cntr + 1
+
 
 def adds(prg_cntr: int, args: list):
     """ Add two numbers and store in <var>
@@ -90,6 +94,7 @@ def adds(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value + op2.value)
     return prg_cntr + 1
 
+
 def subs(prg_cntr: int, args: list):
     """ Subtract two numbers and store in <var>
         SUBS
@@ -117,6 +122,7 @@ def subs(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value - op2.value)
     return prg_cntr + 1
 
+
 def muls(prg_cntr: int, args: list):
     """ Multiply two numbers and store in <var>
         MULS
@@ -143,6 +149,7 @@ def muls(prg_cntr: int, args: list):
 
     CoreData.stack_push(op1.value * op2.value)
     return prg_cntr + 1
+
 
 def divs(prg_cntr: int, args: list):
     """ Divide two numbers and store in <var>
@@ -177,6 +184,7 @@ def divs(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value / op2.value)
     return prg_cntr + 1
 
+
 def idivs(prg_cntr: int, args: list):
     """ Divide two numbers and store in <var> round down value
         IDIVS
@@ -210,6 +218,7 @@ def idivs(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value // op2.value)
     return prg_cntr + 1
 
+
 def lts(prg_cntr: int, args: list):
     """ Check if <symb1> is less than <symb2>; store in <var>
         LTS
@@ -239,6 +248,7 @@ def lts(prg_cntr: int, args: list):
 
     CoreData.stack_push(op1.value < op2.value)
     return prg_cntr + 1
+
 
 def gts(prg_cntr: int, args: list):
     """ Check if <symb1> is greater than <symb2>; store in <var>
@@ -271,6 +281,7 @@ def gts(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value > op2.value)
     return prg_cntr + 1
 
+
 def eqs(prg_cntr: int, args: list):
     """ Check if <symb1> and <symb2> values are equal; store in <var>
         EQS
@@ -296,6 +307,7 @@ def eqs(prg_cntr: int, args: list):
 
     CoreData.stack_push(op1.value == op2.value)
     return prg_cntr + 1
+
 
 def ands(prg_cntr: int, args: list):
     """ Store 'true' in <var> if both <symb1> and <symb2> are 'true'
@@ -324,6 +336,7 @@ def ands(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value and op2.value)
     return prg_cntr + 1
 
+
 def ors(prg_cntr: int, args: list):
     """ Store 'false' in <var> if both <symb1> and <symb2> are 'false'
             otherwise store 'true'
@@ -351,6 +364,7 @@ def ors(prg_cntr: int, args: list):
     CoreData.stack_push(op1.value or op2.value)
     return prg_cntr + 1
 
+
 def nots(prg_cntr: int, args: list):
     """ Negate <symb> value and store in <var>
         NOTS
@@ -375,6 +389,7 @@ def nots(prg_cntr: int, args: list):
 
     CoreData.stack_push(not op1.value)
     return prg_cntr + 1
+
 
 def int2chars(prg_cntr: int, args: list):
     """ Convert number <symb> to ascii value character
@@ -405,6 +420,7 @@ def int2chars(prg_cntr: int, args: list):
 
     CoreData.stack_push(chr(op1.value))
     return prg_cntr + 1
+
 
 def stri2ints(prg_cntr: int, args: list):
     """ Store ascii value of character at position <symb2> in string <symb1>
@@ -438,6 +454,7 @@ def stri2ints(prg_cntr: int, args: list):
     CoreData.stack_push(ord(op1.value[op2.value]))
     return prg_cntr + 1
 
+
 def int2floats(prg_cntr: int, args: list):
     """ Converts int value <symb> to float and store in <var>
         INT2FLOATS
@@ -463,6 +480,7 @@ def int2floats(prg_cntr: int, args: list):
     CoreData.stack_push(float(op1.value))
     return prg_cntr + 1
 
+
 def float2ints(prg_cntr: int, args: list):
     """ Converts float value <symb> to int and store in <var>
         FLOAT2INTS
@@ -487,6 +505,7 @@ def float2ints(prg_cntr: int, args: list):
 
     CoreData.stack_push(int(op1.value))
     return prg_cntr + 1
+
 
 def jumpifeqs(prg_cntr: int, args: list):
     """ Jump to <label> if <symb1> is equal to <symb2>
@@ -514,6 +533,7 @@ def jumpifeqs(prg_cntr: int, args: list):
                 ErrorCode.RUNTIME_WRONG_TYPE)
 
     return CoreData.labels[lbl_name] if op1.value == op2.value else prg_cntr + 1
+
 
 def jumpifneqs(prg_cntr: int, args: list):
     """ Jump to <label> if <symb1> is not equal to <symb2>

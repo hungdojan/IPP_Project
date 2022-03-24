@@ -14,8 +14,6 @@ def arg_process():
     parser.add_argument('--input', action='store', metavar='filename',
             nargs=1, help='Vstupni soubor')
 
-    # TODO: stats
-
     args = parser.parse_args()
     if args.source is None and args.input is None:
         parser.error('Alespon jeden argument musi byt zavolan')
@@ -23,6 +21,6 @@ def arg_process():
         CoreData.source_file = args.source[0]
     if args.input:
         # store file content as a list
-        f = open(args.input[0], 'r')
-        CoreData.input_file = f.read().split('\n')
-        f.close()
+        _f = open(args.input[0], 'r')
+        CoreData.input_file = _f.read().split('\n')
+        _f.close()

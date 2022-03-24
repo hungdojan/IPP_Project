@@ -48,6 +48,7 @@ def format_validation(dtype: str, value):
             return True
     return False
 
+
 def root_element_validation(root: ET.Element) -> bool:
     """Check root element struction
 
@@ -66,8 +67,9 @@ def root_element_validation(root: ET.Element) -> bool:
         return True
     return False
 
+
 def inst_element_validation(inst: ET.Element, order_used: list):
-    """Check element 'instruction' structure 
+    """Check element 'instruction' structure
 
     Terminate program with code ErrorCode.XML_STRUCTURE_ERROR
     when error occure.
@@ -122,6 +124,7 @@ def inst_element_validation(inst: ET.Element, order_used: list):
 
     return opcode, order
 
+
 def argument_attr_check(table_args: dict) -> list:
     """Check 'args' elemet strucure
 
@@ -164,7 +167,7 @@ def xml_parser() -> list:
     try:
         tree = ET.parse(xml_path)
     except:
-        ErrorCode.exit_error(f"Input XML file is not well-formed!",
+        ErrorCode.exit_error("Input XML file is not well-formed!",
                              ErrorCode.XML_FORMAT_ERROR)
     program = tree.getroot()
     # check root attributes

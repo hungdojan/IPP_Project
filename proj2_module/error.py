@@ -20,6 +20,7 @@ class ErrorCode:
 
     UNDEFINED_ERROR = 99
 
+
     @staticmethod
     def exit_error(msg: str, error_code: int):
         """Print error message to stderr and terminate program with given value
@@ -32,4 +33,3 @@ class ErrorCode:
         sys.stderr.write(msg)
         sys.stderr.write('\n')
         sys.exit(error_code)
-

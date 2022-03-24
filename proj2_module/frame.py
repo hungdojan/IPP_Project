@@ -14,6 +14,7 @@ class Variable(Argument):
     def __init__(self):
         super().__init__()
 
+
     @Argument.value.setter
     def value(self, value):
         """Set new value and data type acording to that"""
@@ -31,6 +32,7 @@ class Variable(Argument):
         else:
             sys.exit(ErrorCode.UNDEFINED_ERROR)
 
+
     @staticmethod
     def simplify_var_name(var_name: str):
         """Removes prefixes GF@, LF@, TF@ from variable's name
@@ -44,6 +46,7 @@ class Variable(Argument):
         """
         return re.sub("^(GF|LF|TF)@", "", var_name)
 
+
 class Frame:
 
     def __init__(self):
@@ -54,6 +57,7 @@ class Frame:
     @property
     def vars(self):
         return self._vars
+
 
     def add_variable(self, var_name: str):
         """Adds new variable to the frame
@@ -71,6 +75,7 @@ class Frame:
         new_var = Variable()
         self._vars[var_name] = new_var
         return new_var
+
 
     def get_var(self, var_name: str):
         """Returns variable instance in the frame.
