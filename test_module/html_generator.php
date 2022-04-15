@@ -31,7 +31,7 @@ class HtmlGenerator
     private function setup()
     {
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML(HtmlTemplates::$body);
+        $this->doc->loadHTML(HtmlTemplates::get_body());
         $this->body = $this->doc->getElementsByTagName('body')->item(0);
     }
 

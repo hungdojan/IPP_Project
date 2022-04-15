@@ -16,18 +16,22 @@ class HtmlTemplates
         'yellow' => 'rgba(254,225,145,1)',
         'green'  => 'rgba(95,167,119,1)'
     ];
-    public static $body = <<<EOT
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <link rel="stylesheet" href="test_module/extra/style.css" />
-        <title>IPPcode22 Test Results</title>
-    </head>
-    <body>
-    </body>
-    <script src="test_module/extra/script.js"></script>
-    </html>
-    EOT;
+    public static function get_body() {
+        # workaround to pass this file's dirname into HEREDOC
+        $fun_name = 'dirname';
+        return <<<EOT
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <link rel="stylesheet" href="{$fun_name(__FILE__)}/extra/style.css" />
+            <title>IPPcode22 Test Results</title>
+        </head>
+        <body>
+        </body>
+        <script src="{$fun_name(__FILE__)}/extra/script.js"></script>
+        </html>
+        EOT;
+    }
 
     public static $test_passed = <<<EOT
     <div id="test1" class="testPassed">
@@ -74,6 +78,7 @@ class HtmlTemplates
            To get more informations about test unit click on the corresponding test section</p>
     </div>
     EOT;
+
 }
 /* html_templates.php */
 ?>

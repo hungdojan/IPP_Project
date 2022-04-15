@@ -274,7 +274,9 @@ class TestProcess
             // append test instance into list of tests for later HTML display
             array_push($this->lof_tests, $t_ins);
             $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
-            echo "$files[testname] $result_char\033[0m\n";
+
+            // UNCOMMENT TO LOG TEST RESULT
+            // echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 
@@ -322,7 +324,9 @@ class TestProcess
             }
             array_push($this->lof_tests, $t_ins);
             $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
-            echo "$files[testname] $result_char\033[0m\n";
+
+            // UNCOMMENT TO LOG TEST RESULT
+            // echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 
@@ -371,7 +375,9 @@ class TestProcess
             }
             array_push($this->lof_tests, $t_ins);
             $result_char = $t_ins->get_test_result() ? "\033[1;32m\u{2713}" : "\033[1;31m\u{2715}";
-            echo "$files[testname] $result_char\033[0m\n";
+
+            // UNCOMMENT TO LOG TEST RESULT
+            // echo "$files[testname] $result_char\033[0m\n";
         } // foreach ($test_files as $file)
     }
 
@@ -384,7 +390,7 @@ class TestProcess
         $hg->generate_results($this->ti->nof_passed, $this->ti->nof_tests);
         foreach ($this->lof_tests as $test_instance)
             $hg->add_test_instance($test_instance);
-        $hg->generate_files('index.html');
+        $hg->generate_files();
     }
 
 }
