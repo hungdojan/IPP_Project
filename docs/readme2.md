@@ -74,7 +74,7 @@ Podle nastavených parametrů se testovací skript může spustit ve třech rež
 Nejprve se ve zvolené složce najdou příslušné testovací soubory (`.in`, `.src`, `.out`, `.rc`), poté se spustí test nad těmito soubory a porovnávají se návratové hodnoty a obsah výstupu. Pokud všechny tyto výstupy odpovídají předpokládaným výstupům, daný test je prohlášen za úspěšný, v opačném případě daný test selhal. Výsledky testů se pak uloží do seznamu testů pro pozdější generování HTML souboru.
 
 ## Vygenerování HTML
-Poté, co se získají výsledky všech testů, program zpracuje záznamy testů a vygeneruje HTML soubor. Při inicializaci si objekt třídy `HtmlGenerator` načte a uloží hlavní stromovou strukturu těla HTML. Nejprve se přidá sekce o celkovém výsledku testu, pak se postupně přidávají výsledky jednotlivých testů a nakonec se vytvoří finální soubor `index.html`. Přidávání výsledků jednotlivých testů řeší funkce `add_test_instance`. Ta si načte příslušnou šablonu z `HtmlTemplates`, doplní údaje z testu a přidá do `<body></body>` elementu. 
+Poté, co se získají výsledky všech testů, program zpracuje záznamy testů a vygeneruje HTML soubor. Při inicializaci si objekt třídy `HtmlGenerator` načte a uloží hlavní stromovou strukturu těla HTML. Nejprve se přidá sekce o celkovém výsledku testu, pak se postupně přidávají výsledky jednotlivých testů a nakonec se obsah vypíše na standartní výstup. Přidávání výsledků jednotlivých testů řeší funkce `add_test_instance`. Ta si načte příslušnou šablonu z `HtmlTemplates`, doplní údaje z testu a přidá do `<body></body>` elementu. 
 Dodatečná skripta `script.js` a `style.css` jsou uložena ve složce `test_module/extra`.
 
 ## Struktura testovacího skriptu
