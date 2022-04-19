@@ -31,7 +31,7 @@ class HtmlGenerator
     private function setup()
     {
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML(HtmlTemplates::get_body());
+        $this->doc->loadHTML(HtmlTemplates::$body);
         $this->body = $this->doc->getElementsByTagName('body')->item(0);
     }
 
@@ -100,6 +100,7 @@ class HtmlGenerator
      */
     public function add_test_instance($test_instance)
     {
+        static $test_number = 1;
         // choose test output depending on test result
         $doc = new DOMDocument();
         if ($test_instance->get_test_result())
@@ -108,6 +109,9 @@ class HtmlGenerator
             $doc->loadXML(HtmlTemplates::$test_failed);
 
         $div = $doc->documentElement;
+        $testID = $doc->createAttribute('id');
+        $testID->value = 'test'.$test_number++;
+        $div->appendChild($testID);
         // set test name 
         $h2 = $div->childNodes[1];
         $h2->nodeValue = $test_instance->test_name;
@@ -181,6 +185,11 @@ class HtmlGenerator
      */
     public function generate_files($file=null)
     {
+        // add script
+        $doc = new DOMDocument();
+        $doc->loadXML(HtmlTemplates::$script);
+        $script = $doc->documentElement;
+        $this->body->appendChild($this->doc->importNode($script, true));
         // generate html file
         if (is_null($file))
             echo $this->doc->saveHTML();

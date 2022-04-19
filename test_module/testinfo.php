@@ -172,7 +172,7 @@ class TestInfo
 
         if (!is_file($this->int_script))
         {
-            error_log("Interpret script not found!\nFor help use --help option",
+            echo_log("Interpret script not found!\nFor help use --help option",
                 $this->logfile, true);
             exit(41);
         }
@@ -202,7 +202,7 @@ class TestInfo
 
         if (!is_file($this->int_script))
         {
-            error_log("Interpret script not found!\nFor help use --help option",
+            echo_log("Interpret script not found!\nFor help use --help option",
                 $this->logfile, true);
             exit(41);
         }
